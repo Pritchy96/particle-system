@@ -36,25 +36,6 @@ double rotate_z = 0;
 
 glm::mat4 scaleMatrix = glm::scale(glm::vec3(100.0, 100.0, 100.0));
 
-vector<float> test_data_lines = {
-	0.000000, 0.000000, 0.000000,
-	2.870316, -101.411970, 1.000000,
-
-	0.000000, 0.000000, 0.000000,
-	3.897837, 14.548908, 1.000000,
-
-	0.000000, 0.000000, 0.000000,
-	4.398729, 18.116240, 1.000000,
-
-	0.000000, 0.000000, 0.000000,
-	5.055743, 6.247947, 1.000000,
-
-	0.000000, 0.000000, 0.000000,
-	5.365756, 6.035206, 1.000000,
-
-	0.000000, 0.000000, 0.000000,
-	5.693254, 14.517317, 1.000000
-};
 
 //Blatantly stolen.
 void renderEnvironment::update_fps_counter(GLFWwindow* window) {
@@ -135,30 +116,19 @@ void renderEnvironment::update() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (vector<Renderable>::iterator renderable = renderables.begin(); renderable!=renderables.end(); ++renderable) {
-
-		// cout << "Rendering Renderable" << endl;
-		//Our ModelViewProjection : multiplication of our 3 matrices
 		glm::mat4 MVP = input->getProjectionMatrix() * input->getViewMatrix() * renderable->modelMatrix;
-
-		// cout << "MVP Matrix: " << glm::to_string(MVP) << endl;
-		// cout << "Scale Matrix: " << glm::to_string(scaleMatrix) << endl;
 
 		shaderID = glGetUniformLocation(renderable->shader, "scale");
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
 		
-		shaderID = glGetUniformLocation(renderable->shader, "MVP"); //Get a handle for the MVP uniform var from the shader program
-		//Send our transformation to the currently bound shader, in the "MVP" uniform
-		//For each model you render, since the MVP will be different (at least the M part)
+		shaderID = glGetUniformLocation(renderable->shader, "MVP"); 
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
 
 		glUseProgram(renderable->shader);
-
-		//1st attribute buffer : vertices
 		glBindVertexArray(renderable->getVAO());
 		glDrawArrays(GL_LINES, 0, renderable->vertexes.size());
 	}
 
-	//Put the stuff we've been drawing onto the display
 	glfwSwapBuffers(window);
 
 	//Update other events like input handling 
