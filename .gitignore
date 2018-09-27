@@ -1,0 +1,9 @@
+#Ignore executables
+bin/*
+
+#Ignore build and lib dirs
+build
+lib/*
+main.code-workspace
+.vscode/c_cpp_properties.json
+.vscode/launch.json
