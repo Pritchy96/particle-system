@@ -65,6 +65,15 @@ Renderable::Renderable(GLuint Shader) {
 	shader = Shader;
 }
 
+//Uses Vert Data as placeholder Colour data too
+Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data) {
+	shader = Shader;
+
+	vertexes = vert_data;
+	colours = vert_data;
+
+}
+
 Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data) {
 	shader = Shader;
 

@@ -15,6 +15,7 @@
         public:
             Renderable();
             Renderable(GLuint Shader);
+            Renderable(GLuint Shader, vector<glm::vec3> vert_data);
             Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data);
 
             GLuint getVAO();   
