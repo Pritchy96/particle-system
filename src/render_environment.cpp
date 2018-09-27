@@ -37,7 +37,6 @@ double rotate_z = 0;
 glm::mat4 scaleMatrix = glm::scale(glm::vec3(100.0, 100.0, 100.0));
 
 
-
 //Blatantly stolen.
 void renderEnvironment::update_fps_counter(GLFWwindow* window) {
 	//Get time.

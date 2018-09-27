@@ -23,19 +23,12 @@ GLuint Renderable::getVAO() {
 			verts.push_back(point->x);
 			verts.push_back(point->y);
 			verts.push_back(point->z); 
-			cout << "Point: " << glm::to_string(*point) << endl; 
 		}
 
 		for (vector<glm::vec3>::const_iterator colour = vertexes.begin(); colour!=vertexes.end(); ++colour) {
 			cols.push_back(colour->x);
 			cols.push_back(colour->y);
 			cols.push_back(colour->z); 
-			// cout << "Point: " << glm::to_string(*point) << endl; 
-		}
-
-
-		for (vector<float>::const_iterator it = verts.begin(); it!=verts.end(); ++it) {
-			cout << *it << endl;
 		}
 
 		glGenVertexArrays(1, &vao);
@@ -47,13 +40,11 @@ GLuint Renderable::getVAO() {
 
 		glBindBuffer(GL_ARRAY_BUFFER, pos_vbo);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STREAM_DRAW);
 
 		glBindBuffer(GL_ARRAY_BUFFER, col_vbo);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STATIC_DRAW);
-
-		cout << verts.size() << endl;
+		glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STREAM_DRAW);
 
 		validVAO = true;
 	}
