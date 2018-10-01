@@ -18,6 +18,8 @@
             ParticleSystem();
             ParticleSystem(GLuint Shader);
             ParticleSystem(GLuint Shader, glm::vec3 origin, int numberOfParticles);
+            virtual ~ParticleSystem() = default;
+            
             GLuint getTransBuffer();
             GLuint getPrevTBuf();
 

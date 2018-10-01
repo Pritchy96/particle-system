@@ -74,5 +74,3 @@ Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::v
 	colours = colour_data;
 
 }
-
-

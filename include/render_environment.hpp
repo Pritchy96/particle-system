@@ -9,6 +9,7 @@
     #include <glm/glm.hpp>
     #include <glm/gtc/matrix_transform.hpp>
     #include "../include/renderable.hpp"
+    #include "../include/particle_system.hpp"
 
     using namespace glm;
     using namespace std;
@@ -18,12 +19,15 @@
             renderEnvironment();
             ~renderEnvironment();
             void addRenderable(Renderable renderable);
+            void addParticleSystem(ParticleSystem particle_system);
             void update();
             static void error_callback(int error, const char* description);
             static void window_size_callback(GLFWwindow* window, int width, int height);
             static void update_fps_counter(GLFWwindow* window);
 
-            vector<Renderable> renderables;            
+            vector<Renderable> renderables;    
+            vector<ParticleSystem> particle_systems;            
+
     };
 
 #endif

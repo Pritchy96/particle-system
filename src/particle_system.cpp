@@ -23,20 +23,23 @@ ParticleSystem::ParticleSystem(GLuint Shader, glm::vec3 origin, int numberOfPart
     for (int i = 0; i < numberOfParticles; i++) {
         vertexes.push_back(vec3(0.0f)); //Init all new particles at emitter origin.
         colours.push_back(vec3(0.4f, 1.0f, 0.3f));
-
-        cout << glm::to_string(colours[i]) << endl;
     }
 }
 
 GLuint ParticleSystem::getTransBuffer() {
 	if (isNewSystem) {
+		glBindVertexArray(vao);
+		glEnableVertexAttribArray(2);
+		
 		glGenBuffers(1, &tb_current);
 		glBindBuffer(GL_ARRAY_BUFFER, tb_current);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * particleCount, nullptr, GL_STATIC_READ);
+		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size(), nullptr, GL_STATIC_READ);
 		
-		glGenBuffers(1, &tb_previous);
-		glBindBuffer(GL_ARRAY_BUFFER, tb_previous);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * particleCount, nullptr, GL_STATIC_READ);
+		// glGenBuffers(1, &tb_previous);
+		// glBindBuffer(GL_ARRAY_BUFFER, tb_previous);
+		// glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, 0);
+		// glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size(), nullptr, GL_STATIC_READ);
 	}
 
 	//Lol this aint gonna work

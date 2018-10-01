@@ -16,6 +16,7 @@
 #include "../include/shader.hpp"
 #include "../include/render_environment.hpp"
 #include "../include/renderable.hpp"
+#include "../include/particle_system.hpp"
 #include "../include/viewspace_input.hpp"
 
 using namespace std;
@@ -65,6 +66,7 @@ void renderEnvironment::update_fps_counter(GLFWwindow* window) {
 renderEnvironment::renderEnvironment() {
 	//Our ModelViewProjection : multiplication of our 3 matrices
 	if( !glfwInit() ) {
+		// glDrawArrays(GL_POINTS, 0, particle_system
 		fprintf( stderr, "Failed to initialize GLFW\n" );
 	}
 
@@ -77,8 +79,10 @@ renderEnvironment::renderEnvironment() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		// glDrawArrays(GL_POINTS, 0, particle_system
 	
 	window = glfwCreateWindow(gl_width, gl_height, "Particle System", NULL, NULL);
+		// glDrawArrays(GL_POINTS, 0, particle_system
 
 	if( !window ) {
 		fprintf(stderr, "Failed to open GLFW window.\n" );
@@ -109,23 +113,91 @@ void renderEnvironment::addRenderable(Renderable renderable) {
 	renderables.push_back(renderable);
 }
 
+void renderEnvironment::addParticleSystem(ParticleSystem particle_system) {
+	particle_systems.push_back(particle_system);
+}
+
 void renderEnvironment::update() {
 	input->update(window);
 	update_fps_counter(window);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (vector<Renderable>::iterator renderable = renderables.begin(); renderable!=renderables.end(); ++renderable) {
-		glm::mat4 MVP = input->getProjectionMatrix() * input->getViewMatrix() * renderable->modelMatrix;
+	for (vector<ParticleSystem>::iterator particle_system = particle_systems.begin(); particle_system!=particle_systems.end(); ++particle_system) {
+		glm::mat4 MVP = input->getProjectionMatrix() * input->getViewMatrix() * particle_system->modelMatrix;
 
-		shaderID = glGetUniformLocation(renderable->shader, "scale");
+		shaderID = glGetUniformLocation(particle_system->shader, "scale");
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
 		
-		shaderID = glGetUniformLocation(renderable->shader, "MVP"); 
+		shaderID = glGetUniformLocation(particle_system->shader, "MVP"); 
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
+		
 
-		glUseProgram(renderable->shader);
-		glBindVertexArray(renderable->getVAO());
-		glDrawArrays(GL_POINTS, 0, renderable->vertexes.size());
+		//Turn rendering off
+		// glEnable(GL_RASTERIZER_DISCARD);
+
+		glUseProgram(particle_system->shader);
+		glBindVertexArray(particle_system->getVAO());
+		
+
+		 
+	 
+		// // Create transform feedback buffer
+		// GLuint tbo;
+		// glGenBuffers(1, &tbo);
+		// glBindBuffer(GL_ARRAY_BUFFER, tbo);
+		// glBufferData(GL_ARRAY_BUFFER, sizeof(data) * 3, nullptr, GL_STATIC_READ);
+	 
+		// // Perform feedback transform
+		// glEnable(GL_RASTERIZER_DISCARD);
+	 
+		// glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);
+	 
+		// glBeginTransformFeedback(GL_TRIANGLES);
+		// 	glDrawArrays(GL_POINTS, 0, 5);
+		// glEndTransformFeedback();
+	 
+		// glDisable(GL_RASTERIZER_DISCARD);
+	 
+		// glFlush();
+
+
+		
+
+		GLuint tbuf = particle_system->getTransBuffer();
+
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbuf);
+		// glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tbuf);
+		glBeginTransformFeedback(GL_POINTS);
+
+		// // if(particle_system->isNewSystem) {
+		// 	glBindVertexArray(particle_system->getVAO());
+		glDrawArrays(GL_POINTS, 0, particle_system->vertexes.size());
+		// 	particle_system->isNewSystem = false;
+		// // } else {
+		// // 	glDrawTransformFeedback(GL_POINTS, particle_system->getPrevTBuf());
+		// // }
+
+		glEndTransformFeedback();
+
+		GLfloat feedback[particle_system->particleCount];
+		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+
+		int k=0;
+        for(int i=0; i < particle_system->particleCount; i++) {            
+            cout<<feedback[i]<<" ";
+            k++;
+            if(k==4){cout<<endl; k=0;}
+        }
+
+		cout << endl;
+
+		// //Turn rendering ON
+        // glDisable(GL_RASTERIZER_DISCARD);
+
+		//Render particles from feedback object Current
+
+		// glDrawTransformFeedback(GL_POINTS, tbuf);
+		// glDrawArrays(GL_POINTS, 0, particle_system->vertexes.size());
 	}
 
 	glfwSwapBuffers(window);
