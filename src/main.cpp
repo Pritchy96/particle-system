@@ -10,6 +10,8 @@
 
 #include "../include/render_environment.hpp"
 #include "../include/shader.hpp"
+#include "../include/particle_system.hpp"
+
 
 using namespace std;
 using namespace boost;
@@ -55,7 +57,7 @@ int main(int argc, const char* argv[]) {
 	GLuint basicShader = LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
 
     renderer->addRenderable(*new Renderable(basicShader, axis_lines, axis_colours));
-    renderer->addRenderable(*new Renderable(basicShader, test_data_lines));
+    renderer->addRenderable(*new ParticleSystem(basicShader, vec3(2.0f), 1));
 
 
     while (true) {  //TODO: Write proper update&exit logic.

@@ -34,8 +34,7 @@ double rotate_y = 0;
 double rotate_x = 0;
 double rotate_z = 0;
 
-glm::mat4 scaleMatrix = glm::scale(glm::vec3(100.0, 100.0, 100.0));
-
+glm::mat4 scaleMatrix = glm::scale(glm::vec3(10.0, 10.0, 10.0));
 
 //Blatantly stolen.
 void renderEnvironment::update_fps_counter(GLFWwindow* window) {
@@ -126,7 +125,7 @@ void renderEnvironment::update() {
 
 		glUseProgram(renderable->shader);
 		glBindVertexArray(renderable->getVAO());
-		glDrawArrays(GL_LINES, 0, renderable->vertexes.size());
+		glDrawArrays(GL_POINTS, 0, renderable->vertexes.size());
 	}
 
 	glfwSwapBuffers(window);
