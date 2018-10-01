@@ -17,13 +17,13 @@
         public:
             ParticleSystem();
             ParticleSystem(GLuint Shader);
-            ParticleSystem(GLuint Shader, vector<glm::vec3> vert_data);
-            ParticleSystem(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data);
+            ParticleSystem(GLuint Shader, glm::vec3 origin, int numberOfParticles);
+            GLuint getTransBuffer();
+            GLuint getPrevTBuf();
 
-            vector<vec3> vertexes, colours;
-	        GLuint pos_vbo, col_vbo, vao, shader;
-            glm::mat4 modelMatrix = glm::mat4(1.0f);
-            bool validVAO = false;
+            int particleCount;
+            bool isNewSystem = true;
+            GLuint tb_current, tb_previous;
     };
 
 #endif

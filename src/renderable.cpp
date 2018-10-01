@@ -25,10 +25,12 @@ GLuint Renderable::getVAO() {
 			verts.push_back(point->z); 
 		}
 
-		for (vector<glm::vec3>::const_iterator colour = vertexes.begin(); colour!=vertexes.end(); ++colour) {
+		for (vector<glm::vec3>::const_iterator colour = colours.begin(); colour!=colours.end(); ++colour) {
 			cols.push_back(colour->x);
 			cols.push_back(colour->y);
 			cols.push_back(colour->z); 
+
+			cout << glm::to_string(*colour) << endl;
 		}
 
 		glGenVertexArrays(1, &vao);
