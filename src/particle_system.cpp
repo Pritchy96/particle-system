@@ -14,8 +14,8 @@
 using namespace glm;
 using namespace std;
 
-Particle_System::Particle_System(GLuint Shader, int numberOfParticles) {
-	shader = Shader;
+Particle_System::Particle_System(vec3 Position, vec3 Colour, GLuint Shader, int numberOfParticles)
+: Renderable(shader, vector<vec3>{Position}, vector<vec3>{Colour}) {
 	particleCount = numberOfParticles;
 }
 
@@ -23,17 +23,17 @@ GLuint Particle_System::getTransBuffer() {
 	if (isNewSystem) {
 		glGenBuffers(1, &tb_current);
 		glBindBuffer(GL_ARRAY_BUFFER, tb_current);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * particleCount, nullptr, GL_STATIC_READ);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * particleCount, nullptr, GL_STATIC_READ);
 		
 		glGenBuffers(1, &tb_previous);
 		glBindBuffer(GL_ARRAY_BUFFER, tb_previous);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * particleCount, nullptr, GL_STATIC_READ);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * particleCount, nullptr, GL_STATIC_READ);
 	}
 
 	//Lol this aint gonna work
-	GLuint placeholder = tb_current;
-	tb_current = tb_previous;
-	tb_previous = placeholder;
+	// GLuint placeholder = tb_current;
+	// tb_current = tb_previous;
+	// tb_previous = placeholder;
 	return tb_current;
 }
 

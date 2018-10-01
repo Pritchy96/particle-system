@@ -58,7 +58,7 @@ int main(int argc, const char* argv[]) {
 
 	GLuint basicShader = LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
 
-    // renderer->addRenderable(*new Renderable(basicShader, axis_lines, axis_colours));
+    renderer->addParticleSystem(*new Particle_System(vec3(0, 0, 0), vec3(1.0f, 0.0f, 0.0f), basicShader, 1));
     // // renderer->addRenderable(*new Renderable(basicShader, test_data_lines));
 	// renderer->addRenderable(*new Particle_Group(basicShader, glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(1.0f, 0.0f, 0.0f), 10));
 

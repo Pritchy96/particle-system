@@ -124,33 +124,55 @@ void renderEnvironment::update() {
 		shaderID = glGetUniformLocation(particle_system->shader, "MVP"); 
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
 
+
+		
+
+
 		//Turn rendering off
-		glEnable(GL_RASTERIZER_DISCARD_EXT);
+		// glEnable(GL_RASTERIZER_DISCARD);
 
-		glUseProgram(particle_system->shader);
+		// glUseProgram(particle_system->shader);
 
-		GLuint tbuf = particle_system->getTransBuffer();
+		// GLuint tbuf = particle_system->getTransBuffer();
 
-		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tbuf);
-		glBeginTransformFeedback(GL_POINTS);
+        // glBindBufferBase(GL_TRANSFORM_FEEDBACK, 0, tbuf);
+		// // glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tbuf);
+		// glBeginTransformFeedback(GL_POINTS);
 
-		if(particle_system->isNewSystem) {
-			glDrawArrays(GL_POINTS, 0, particle_system->particleCount);
-			particle_system->isNewSystem = false;
-		} else {
-			glDrawTransformFeedback(GL_POINTS, particle_system->getPrevTBuf());
-		}
+		// // if(particle_system->isNewSystem) {
+		// 	glBindVertexArray(particle_system->getVAO());
+		// 	glDrawArrays(GL_POINTS, 0, particle_system->vertexes.size());
+		// 	particle_system->isNewSystem = false;
+		// // } else {
+		// // 	glDrawTransformFeedback(GL_POINTS, particle_system->getPrevTBuf());
+		// // }
 
-		glEndTransformFeedback();
+		// glEndTransformFeedback();
 
-		//Turn rendering ON
-		glDisable(GL_RASTERIZER_DISCARD_EXT);
+		// GLint feedback[particle_system->particleCount];
+		// glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(float) * 4 * particle_system->particleCount, feedback);
+
+		// int k=0;
+        // for(int i=0; i < 4 * particle_system->particleCount; i++)
+        // {            
+        //     cout<<feedback[i]<<" ";
+        //     k++;
+        //     if(k==4){cout<<endl; k=0;}
+        // }
+
+		// cout << endl;
+
+		// //Turn rendering ON
+        // glDisable(GL_RASTERIZER_DISCARD);
 
 		//Render particles from feedback object Current
-		glDrawTransformFeedback(GL_POINTS, tbuf);
-	}
+		// glDrawTransformFeedback(GL_POINTS, tbuf);
 
-	
+		glUseProgram(particle_system->shader);
+		glBindVertexArray(particle_system->getVAO());
+		glDrawArrays(GL_POINT, 0, particle_system->vertexes.size());
+
+	}
 
 	glfwSwapBuffers(window);
 

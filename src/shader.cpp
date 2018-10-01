@@ -94,7 +94,7 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 	glAttachShader(ProgramID, FragmentShaderID);
 
 
-	const GLchar* feedbackVaryings[] = { "vertexPosition_modelspace" };
+	const GLchar* feedbackVaryings[] = { "out_pos" };
 	glTransformFeedbackVaryings(ProgramID, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
 
 
