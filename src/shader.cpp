@@ -86,12 +86,19 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 
 	cout << "Fragment Shader Compiled and Checked" << endl;
 
+
 	// Link the program
 	fprintf(stdout, "Linking program\n");
 	GLuint ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);
-	glLinkProgram(ProgramID);
+
+
+	const GLchar* feedbackVaryings[] = { "out_pos" };
+	glTransformFeedbackVaryings(ProgramID, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
+
+
+	glLinkProgram(ProgramID); glUseProgram(ProgramID);
 
 	// Check the program
 	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);

@@ -18,6 +18,8 @@
             Renderable(GLuint Shader, vector<glm::vec3> vert_data);
             Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data);
 
+            virtual ~Renderable() {}
+
             GLuint getVAO();   
 
             vector<vec3> vertexes, colours;
