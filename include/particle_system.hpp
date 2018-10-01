@@ -1,5 +1,5 @@
-#ifndef PARTICLE_HPP
-#define PARTICLE_HPP
+#ifndef PARTICLESYSTEM_HPP
+#define PARTICLESYSTEM_HPP
 
     // #include "stdafx.h"
     #include <vector>
@@ -8,22 +8,22 @@
     #include <glm/glm.hpp>
     #include <glm/gtc/matrix_transform.hpp>
 
-    #include "../include/renderable.hpp"
-
     using namespace glm;
     using namespace std;
 
-    class ParticleSystem : public Renderable{
+    class Particle_System {
         public:
-            ParticleSystem();
-            ParticleSystem(GLuint Shader);
-            ParticleSystem(GLuint Shader, vector<glm::vec3> vert_data);
-            ParticleSystem(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data);
+            Particle_System();
+            Particle_System(GLuint Shader, int numberOfParticles);
 
+            GLuint getTransBuffer(), getPrevTBuf();
+
+            GLuint tb_current, tb_previous;
             vector<vec3> vertexes, colours;
 	        GLuint pos_vbo, col_vbo, vao, shader;
             glm::mat4 modelMatrix = glm::mat4(1.0f);
-            bool validVAO = false;
+            int particleCount;
+            bool isNewSystem = true;
     };
 
 #endif

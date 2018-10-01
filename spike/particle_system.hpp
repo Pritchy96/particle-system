@@ -1,5 +1,5 @@
-#ifndef RENDERABLE_HPP
-#define RENDERABLE_HPP
+#ifndef PARTICLE_HPP
+#define PARTICLE_HPP
 
     // #include "stdafx.h"
     #include <vector>
@@ -8,18 +8,17 @@
     #include <glm/glm.hpp>
     #include <glm/gtc/matrix_transform.hpp>
 
+    #include "../include/renderable.hpp"
+
     using namespace glm;
     using namespace std;
 
-    class Renderable {
+    class ParticleSystem : public Renderable{
         public:
-            Renderable();
-            Renderable(GLuint Shader);
-            Renderable(GLuint Shader, vector<glm::vec3> vert_data);
-            Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data);
-
-            GLuint getVAO();   
-            void generateVAO();
+            ParticleSystem();
+            ParticleSystem(GLuint Shader);
+            ParticleSystem(GLuint Shader, vector<glm::vec3> vert_data);
+            ParticleSystem(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data);
 
             vector<vec3> vertexes, colours;
 	        GLuint pos_vbo, col_vbo, vao, shader;

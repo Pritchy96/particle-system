@@ -15,7 +15,7 @@
 
 #include "../include/shader.hpp"
 #include "../include/render_environment.hpp"
-#include "../include/renderable.hpp"
+#include "../include/particle_system.hpp"
 #include "../include/viewspace_input.hpp"
 
 using namespace std;
@@ -94,7 +94,7 @@ renderEnvironment::renderEnvironment() {
 	glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glEnable(GL_PROGRAM_POINT_SIZE);
-	glPointSize(4);
+	glPointSize(10);
 	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 
@@ -106,8 +106,8 @@ renderEnvironment::renderEnvironment() {
 	}
 }
 
-void renderEnvironment::addRenderable(Renderable renderable) {
-	renderables.push_back(renderable);
+void renderEnvironment::addParticleSystem(Particle_System particle_system) {
+	particle_systems.push_back(particle_system);
 }
 
 void renderEnvironment::update() {
@@ -115,19 +115,42 @@ void renderEnvironment::update() {
 	update_fps_counter(window);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (vector<Renderable>::iterator renderable = renderables.begin(); renderable!=renderables.end(); ++renderable) {
-		glm::mat4 MVP = input->getProjectionMatrix() * input->getViewMatrix() * renderable->modelMatrix;
+	for (vector<Particle_System>::iterator particle_system = particle_systems.begin(); particle_system!=particle_systems.end(); ++particle_system) {
+		glm::mat4 MVP = input->getProjectionMatrix() * input->getViewMatrix() * particle_system->modelMatrix;
 
-		shaderID = glGetUniformLocation(renderable->shader, "scale");
+		shaderID = glGetUniformLocation(particle_system->shader, "scale");
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
 		
-		shaderID = glGetUniformLocation(renderable->shader, "MVP"); 
+		shaderID = glGetUniformLocation(particle_system->shader, "MVP"); 
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
 
-		glUseProgram(renderable->shader);
-		glBindVertexArray(renderable->getVAO());
-		glDrawArrays(GL_LINES, 0, renderable->vertexes.size());
+		//Turn rendering off
+		glEnable(GL_RASTERIZER_DISCARD_EXT);
+
+		glUseProgram(particle_system->shader);
+
+		GLuint tbuf = particle_system->getTransBuffer();
+
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tbuf);
+		glBeginTransformFeedback(GL_POINTS);
+
+		if(particle_system->isNewSystem) {
+			glDrawArrays(GL_POINTS, 0, particle_system->particleCount);
+			particle_system->isNewSystem = false;
+		} else {
+			glDrawTransformFeedback(GL_POINTS, particle_system->getPrevTBuf());
+		}
+
+		glEndTransformFeedback();
+
+		//Turn rendering ON
+		glDisable(GL_RASTERIZER_DISCARD_EXT);
+
+		//Render particles from feedback object Current
+		glDrawTransformFeedback(GL_POINTS, tbuf);
 	}
+
+	
 
 	glfwSwapBuffers(window);
 
