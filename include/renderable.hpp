@@ -20,7 +20,7 @@
 
             virtual ~Renderable() {}
 
-            GLuint getVAO();   
+            GLuint getVAO();
 
             vector<vec3> vertexes, colours;
 	        GLuint pos_vbo, col_vbo, vao, shader;

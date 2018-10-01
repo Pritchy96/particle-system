@@ -29,23 +29,29 @@ ParticleSystem::ParticleSystem(GLuint Shader, glm::vec3 origin, int numberOfPart
 GLuint ParticleSystem::getTransBuffer() {
 	if (isNewSystem) {
 		glBindVertexArray(vao);
-		glEnableVertexAttribArray(2);
+
+
+		vector<float> verts, cols;
+		for (vector<glm::vec3>::const_iterator point = vertexes.begin(); point!=vertexes.end(); ++point) {
+			verts.push_back(point->x);
+			verts.push_back(point->y);
+			verts.push_back(point->z); 
+		}
 		
+		glEnableVertexAttribArray(2);
 		glGenBuffers(1, &tb_current);
 		glBindBuffer(GL_ARRAY_BUFFER, tb_current);
-		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size(), nullptr, GL_STATIC_READ);
-		
-		// glGenBuffers(1, &tb_previous);
-		// glBindBuffer(GL_ARRAY_BUFFER, tb_previous);
-		// glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, 0);
-		// glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size(), nullptr, GL_STATIC_READ);
-	}
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size() * 4, verts.data(), GL_STATIC_READ);
 
-	//Lol this aint gonna work
-	// GLuint placeholder = tb_current;
-	// tb_current = tb_previous;
-	// tb_previous = placeholder;
+		glEnableVertexAttribArray(3);
+		glGenBuffers(1, &tb_previous);
+		glBindBuffer(GL_ARRAY_BUFFER, tb_previous);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size() * 4, verts.data(), GL_STATIC_READ);
+	}
+	
+	std::swap(tb_current, tb_previous);
 	return tb_current;
 }
 
