@@ -21,13 +21,15 @@
             void addRenderable(Renderable renderable);
             void addParticleSystem(ParticleSystem particle_system);
             void update();
+            void setupTransformShader(GLuint transformShader);   
             static void error_callback(int error, const char* description);
             static void window_size_callback(GLFWwindow* window, int width, int height);
             static void update_fps_counter(GLFWwindow* window);
-
+            
             vector<Renderable> renderables;    
-            vector<ParticleSystem> particle_systems;            
+            vector<ParticleSystem> particle_systems;   
 
+            GLuint tShader;      
     };
 
 #endif

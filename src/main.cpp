@@ -48,13 +48,18 @@ vector<vec3> test_data_lines = {
 	vec3(5.693254, 14.517317, 1.00000)
 };
 
+unsigned ShaderIds[5] = { 0u };
+
 int main(int argc, const char* argv[]) {
     cout << "Launching Program" << endl;
 
     renderEnvironment *renderer = new renderEnvironment();
     cout << "Initialised renderer" << endl;
 
-	GLuint basicShader = LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
+	GLuint basicShader = Shader::LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
+	GLuint transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
+
+	renderer->setupTransformShader(transformShader);
 
     // renderer->addRenderable(*new Renderable(basicShader, axis_lines, axis_colours));
     renderer->addParticleSystem(*new ParticleSystem(basicShader, vec3(2.0f), 1));
