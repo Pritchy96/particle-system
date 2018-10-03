@@ -25,7 +25,7 @@
 
             int particleCount;
             bool isNewSystem = true;
-            GLuint tb_current, tb_previous;
+            GLuint tb_current, tb_previous, velocities;
     };
 
 #endif

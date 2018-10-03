@@ -30,7 +30,6 @@ GLuint ParticleSystem::getTransBuffer() {
 	if (isNewSystem) {
 		glBindVertexArray(vao);
 
-
 		vector<float> verts, cols;
 		for (vector<glm::vec3>::const_iterator point = vertexes.begin(); point!=vertexes.end(); ++point) {
 			verts.push_back(point->x);
@@ -42,13 +41,13 @@ GLuint ParticleSystem::getTransBuffer() {
 		glGenBuffers(1, &tb_current);
 		glBindBuffer(GL_ARRAY_BUFFER, tb_current);
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size() * 4, verts.data(), GL_STATIC_READ);
-
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size() * 4 * 2, verts.data(), GL_STATIC_READ);
+		
 		glEnableVertexAttribArray(3);
 		glGenBuffers(1, &tb_previous);
 		glBindBuffer(GL_ARRAY_BUFFER, tb_previous);
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size() * 4, verts.data(), GL_STATIC_READ);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size() * 4 * 2, verts.data(), GL_STATIC_READ);
 	}
 	
 	std::swap(tb_current, tb_previous);

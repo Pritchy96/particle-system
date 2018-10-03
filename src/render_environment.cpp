@@ -143,6 +143,8 @@ void renderEnvironment::update() {
 		GLuint tbuf = particle_system->getTransBuffer();
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbuf);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, particle_system->getTransBuffer());
+
 		glBeginTransformFeedback(GL_POINTS);
 
 		if(particle_system->isNewSystem) {
@@ -157,15 +159,14 @@ void renderEnvironment::update() {
 		glEndTransformFeedback();
 		// glBindBuffer(GL_ARRAY_BUFFER,0);
 
-		GLfloat feedback[particle_system->particleCount*4];
+		GLfloat feedback[particle_system->particleCount*4*2];
 		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
 
 		int k=0;
-        for(int i=0; i < particle_system->particleCount*4; i++) {            
-            cout<<feedback[i]<<" ";
+        for(int i=0; i < particle_system->particleCount*6; i++) {            
+            cout<<feedback[i] << " ";
             k++;
-            if(k==4){cout<<endl; k=0;}
-        }
+            if(k==3){cout<<endl; k=0;}        }
 
 		cout << endl;
 
@@ -173,7 +174,6 @@ void renderEnvironment::update() {
         glDisable(GL_RASTERIZER_DISCARD);
 
 		//Render particles from feedback object Current
-
 		glUseProgram(particle_system->shader);
 
 		// glDrawTransformFeedback(GL_POINTS, tbuf);
