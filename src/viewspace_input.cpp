@@ -13,10 +13,10 @@ using namespace std;
 
 vec3 cameraPos, cameraPosDefault;
 mat4 viewMatrix, projectionMatrix;
-float horizontalCameraAngle = 3.14f, verticalCameraAngle = 0.0f, initialCameraFOV = 45.0f;
+float horizontalCameraAngle = 3.14f, verticalCameraAngle = 1.0f, initialCameraFOV = 45.0f;
 int mouseXMax, mouseYMax;
 double mouseXPos, mouseYPos;
-float mouseCoef = 0.00005f;
+float mouseCoef = 0.001f;
 float translationSpeed = 300.0f; // 3 units / second
 double lastFrameTime;
 double currentFrameTime;
@@ -71,24 +71,42 @@ void viewspaceManipulator::update(GLFWwindow *window){
 	// Up vector
 	vec3 up = cross(right, direction);
 
+	float currentTranslationSpeed = translationSpeed;
+
+	//Zoomies
+	// Move forward
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		currentTranslationSpeed *= 2;
+	}
+
 	// Move forward
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		cameraPos += direction * deltaTime * translationSpeed;
+		cameraPos += direction * deltaTime * currentTranslationSpeed;
 	}
 	// Move backward
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		cameraPos -= direction * deltaTime * translationSpeed;
+		cameraPos -= direction * deltaTime * currentTranslationSpeed;
 	}
 	// Strafe right
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		cameraPos += right * deltaTime * translationSpeed;
+		cameraPos += right * deltaTime * currentTranslationSpeed;
 	}
 	// Strafe left
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		cameraPos -= right * deltaTime * translationSpeed;
+		cameraPos -= right * deltaTime * currentTranslationSpeed;
 	}
 
-	float FoV = initialCameraFOV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
+	// Up
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		cameraPos += up * deltaTime * currentTranslationSpeed;
+	}
+
+	// Down
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+		cameraPos -= up * deltaTime * currentTranslationSpeed;
+	}
+
+	float FoV = initialCameraFOV;
 
 	// Projection matrix : 45 Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	projectionMatrix = perspective(FoV, 4.0f / 3.0f, 0.1f, 100000000.0f);

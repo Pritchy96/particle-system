@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 GLuint Shader::LoadShaders(const char * vertex_file_path, const char * fragment_file_path){
 	cout << "Compiling Shaders" << endl;
 	// // Create the shaders
@@ -163,8 +162,9 @@ GLuint Shader::LoadTransformShader(const char * path){
     Varyings[0] = "out_pos";
     Varyings[1] = "out_vel";
 
-    glTransformFeedbackVaryings(ProgramID, 2, Varyings, GL_SEPARATE_ATTRIBS);//GL_INTERLEAVED_ATTRIBS);
-	// glTransformFeedbackVaryings(ProgramID, 2, feedbackVaryings, GL_SEPARATE_ATTRIBS);
+	
+	glTransformFeedbackVaryings(ProgramID, 2, Varyings, GL_SEPARATE_ATTRIBS);
+    // glTransformFeedbackVaryings(ProgramID, 1, Varyings, GL_INTERLEAVED_ATTRIBS);
 
 
 	glLinkProgram(ProgramID); 

@@ -18,11 +18,11 @@ using namespace boost;
 
 vector<vec3> axis_lines = {
     vec3(0.0f, 0.0f, 0.0f),
-	vec3(1000.0f, 0.0f, 0.0f),
+	vec3(100.0f, 0.0f, 0.0f),
 	vec3(0.0f, 0.0f, 0.0f),
-	vec3(0.0f, 1000.0f, 0.0f),    
+	vec3(0.0f, 100.0f, 0.0f),    
 	vec3(0.0f, 0.0f, 0.0f),
-	vec3(0.0f, 0.0f, 1000.0f)
+	vec3(0.0f, 0.0f, 100.0f)
 };
 
 vector<vec3> axis_colours = {
@@ -48,9 +48,9 @@ vector<vec3> test_data_lines = {
 	vec3(5.693254, 14.517317, 1.00000)
 };
 
-unsigned ShaderIds[5] = { 0u };
-
 int main(int argc, const char* argv[]) {
+
+	srand (time(NULL));
     cout << "Launching Program" << endl;
 
     renderEnvironment *renderer = new renderEnvironment();
@@ -59,13 +59,19 @@ int main(int argc, const char* argv[]) {
 	GLuint basicShader = Shader::LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
 	GLuint transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
 
-	renderer->setupTransformShader(transformShader);
+    renderer->addRenderable(new Renderable(basicShader, axis_lines, axis_colours));
+	
+	for (int i = 0; i < 1000; i++) {
+		glm::vec3 origin = vec3( ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000);
+		renderer->addRenderable(new ParticleSystem(basicShader, transformShader, origin, 400));
+	}
 
-    // renderer->addRenderable(*new Renderable(basicShader, axis_lines, axis_colours));
-    renderer->addParticleSystem(*new ParticleSystem(basicShader, vec3(2.0f), 1));
 
 
-    while (true) {  //TODO: Write proper update&exit logic.
+	// renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(0.0f), 200000));
+	
+
+    while (true) {  //TODO: Write proper update & exit logic.
         renderer->update();
     }
 

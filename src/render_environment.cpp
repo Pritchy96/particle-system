@@ -35,8 +35,6 @@ double rotate_y = 0;
 double rotate_x = 0;
 double rotate_z = 0;
 
-glm::mat4 scaleMatrix = glm::scale(glm::vec3(10.0, 10.0, 10.0));
-
 //Blatantly stolen.
 void renderEnvironment::update_fps_counter(GLFWwindow* window) {
 	//Get time.
@@ -94,10 +92,16 @@ renderEnvironment::renderEnvironment() {
 	glfwSetWindowSizeCallback(window, window_size_callback);
 	glfwMakeContextCurrent(window);
 
-	glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	// glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	glClearColor(0.00f, 0.00f, 0.00f, 0.0f);
+
+	
+
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glPointSize(4);
+	glLineWidth(4); //This doesn't work?
+
 	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 
@@ -109,12 +113,8 @@ renderEnvironment::renderEnvironment() {
 	}
 }
 
-void renderEnvironment::addRenderable(Renderable renderable) {
+void renderEnvironment::addRenderable(Renderable* renderable) {
 	renderables.push_back(renderable);
-}
-
-void renderEnvironment::addParticleSystem(ParticleSystem particle_system) {
-	particle_systems.push_back(particle_system);
 }
 
 void renderEnvironment::setupTransformShader(GLuint transformShader) {
@@ -126,59 +126,11 @@ void renderEnvironment::update() {
 	update_fps_counter(window);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (vector<ParticleSystem>::iterator particle_system = particle_systems.begin(); particle_system!=particle_systems.end(); ++particle_system) {
-		glm::mat4 MVP = input->getProjectionMatrix() * input->getViewMatrix() * particle_system->modelMatrix;
-
-		shaderID = glGetUniformLocation(particle_system->shader, "scale");
-		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
-		
-		shaderID = glGetUniformLocation(particle_system->shader, "MVP"); 
-		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
-		
-		//Turn rendering off
-		glEnable(GL_RASTERIZER_DISCARD);
-		
-		glUseProgram(tShader);
-		glBindVertexArray(particle_system->getVAO());
-		GLuint tbuf = particle_system->getTransBuffer();
-
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbuf);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, particle_system->getTransBuffer());
-
-		glBeginTransformFeedback(GL_POINTS);
-
-		if(particle_system->isNewSystem) {
-			glDrawArrays(GL_POINTS, 0, particle_system->particleCount);
-			particle_system->isNewSystem = false;
-		} else { 
-			 glDrawArrays(GL_POINTS, 0, particle_system->particleCount);
-
-		 	// glDrawTransformFeedback(GL_POINTS, particle_system->getPrevTBuf());
-		}
-
-		glEndTransformFeedback();
-		// glBindBuffer(GL_ARRAY_BUFFER,0);
-
-		GLfloat feedback[particle_system->particleCount*4*2];
-		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
-
-		int k=0;
-        for(int i=0; i < particle_system->particleCount*6; i++) {            
-            cout<<feedback[i] << " ";
-            k++;
-            if(k==3){cout<<endl; k=0;}        }
-
-		cout << endl;
-
-		// //Turn rendering ON
-        glDisable(GL_RASTERIZER_DISCARD);
-
-		//Render particles from feedback object Current
-		glUseProgram(particle_system->shader);
-
-		// glDrawTransformFeedback(GL_POINTS, tbuf);
-		glDrawArrays(GL_POINTS, 0, particle_system->particleCount);
+	for (vector<Renderable*>::iterator renderable = renderables.begin(); renderable!=renderables.end(); ++renderable) {
+		(*renderable)->Draw(input->getProjectionMatrix(), input->getViewMatrix());
 	}
+
+	//cout << endl;
 
 	glfwSwapBuffers(window);
 
