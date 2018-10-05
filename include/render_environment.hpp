@@ -19,7 +19,6 @@
             renderEnvironment();
             ~renderEnvironment();
             void addRenderable(Renderable renderable);
-            void addParticleSystem(ParticleSystem particle_system);
             void update();
             void setupTransformShader(GLuint transformShader);   
             static void error_callback(int error, const char* description);

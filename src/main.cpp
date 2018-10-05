@@ -18,11 +18,11 @@ using namespace boost;
 
 vector<vec3> axis_lines = {
     vec3(0.0f, 0.0f, 0.0f),
-	vec3(1000.0f, 0.0f, 0.0f),
+	vec3(100.0f, 0.0f, 0.0f),
 	vec3(0.0f, 0.0f, 0.0f),
-	vec3(0.0f, 1000.0f, 0.0f),    
+	vec3(0.0f, 100.0f, 0.0f),    
 	vec3(0.0f, 0.0f, 0.0f),
-	vec3(0.0f, 0.0f, 1000.0f)
+	vec3(0.0f, 0.0f, 100.0f)
 };
 
 vector<vec3> axis_colours = {
@@ -59,10 +59,8 @@ int main(int argc, const char* argv[]) {
 	GLuint basicShader = Shader::LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
 	GLuint transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
 
-	renderer->setupTransformShader(transformShader);
-
-    // renderer->addRenderable(*new Renderable(basicShader, axis_lines, axis_colours));
-    renderer->addParticleSystem(*new ParticleSystem(basicShader, vec3(2.0f), 1));
+    renderer->addRenderable(*new Renderable(basicShader, axis_lines, axis_colours));
+    // renderer->addParticleSystem(*new ParticleSystem(basicShader, transformShader, vec3(2.0f), 1));
 
 
     while (true) {  //TODO: Write proper update&exit logic.

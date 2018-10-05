@@ -9,6 +9,7 @@
     #include <glm/gtc/matrix_transform.hpp>
 
     #include "../include/renderable.hpp"
+    #include "../include/shader.hpp"
 
     using namespace glm;
     using namespace std;
@@ -16,16 +17,18 @@
     class ParticleSystem : public Renderable{
         public:
             ParticleSystem();
-            ParticleSystem(GLuint Shader);
-            ParticleSystem(GLuint Shader, glm::vec3 origin, int numberOfParticles);
+            ParticleSystem(GLuint Shader, GLuint TransformShader);
+            ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 origin, int numberOfParticles);
             virtual ~ParticleSystem() = default;
             
-            GLuint getTransBuffer();
-            GLuint getPrevTBuf();
+            void Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) override;            
+            GLuint getVAO() override;
+            GLuint getPrevVAO();
 
             int particleCount;
             bool isNewSystem = true;
-            GLuint tb_current, tb_previous, velocities;
+            GLuint transformShader;
+            GLuint vao2;
     };
 
 #endif

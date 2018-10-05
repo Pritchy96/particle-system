@@ -22,15 +22,13 @@ GLuint Renderable::getVAO() {
 		for (vector<glm::vec3>::const_iterator point = vertexes.begin(); point!=vertexes.end(); ++point) {
 			verts.push_back(point->x);
 			verts.push_back(point->y);
-			verts.push_back(point->z); 
+			verts.push_back(point->z);
 		}
 
 		for (vector<glm::vec3>::const_iterator colour = colours.begin(); colour!=colours.end(); ++colour) {
 			cols.push_back(colour->x);
 			cols.push_back(colour->y);
 			cols.push_back(colour->z); 
-
-			cout << glm::to_string(*colour) << endl;
 		}
 
 		glGenVertexArrays(1, &vao);
@@ -42,16 +40,30 @@ GLuint Renderable::getVAO() {
 
 		glBindBuffer(GL_ARRAY_BUFFER, pos_vbo);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_DRAW);
 
 		glBindBuffer(GL_ARRAY_BUFFER, col_vbo);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STATIC_DRAW);
 
 		validVAO = true;
 	}
 
 	return vao;
+}
+
+void Renderable::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix){
+		glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+
+		GLuint shaderID = glGetUniformLocation(shader, "scale");
+		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
+		
+		shaderID = glGetUniformLocation(shader, "MVP"); 
+		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
+
+		glUseProgram(shader);
+		glBindVertexArray(getVAO());
+		glDrawArrays(GL_LINES, 0, vertexes.size());
 }
 
 Renderable::Renderable(GLuint Shader) {
@@ -64,7 +76,6 @@ Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data) {
 
 	vertexes = vert_data;
 	colours = vert_data;
-
 }
 
 Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data) {
@@ -72,5 +83,4 @@ Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::v
 
 	vertexes = vert_data;
 	colours = colour_data;
-
 }

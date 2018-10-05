@@ -5,7 +5,6 @@ layout(location = 2) in vec3 in_pos;
 out vec3 out_pos;
 out vec3 out_vel;
 
-
 void main(void)
 {
     vec3 gravity = vec3(0,-.1,0);
