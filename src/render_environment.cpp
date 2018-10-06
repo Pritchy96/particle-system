@@ -109,7 +109,7 @@ renderEnvironment::renderEnvironment() {
 	}
 }
 
-void renderEnvironment::addRenderable(Renderable renderable) {
+void renderEnvironment::addRenderable(Renderable* renderable) {
 	renderables.push_back(renderable);
 }
 
@@ -122,9 +122,11 @@ void renderEnvironment::update() {
 	update_fps_counter(window);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (vector<Renderable>::iterator renderable = renderables.begin(); renderable!=renderables.end(); ++renderable) {
-		renderable->Draw(input->getProjectionMatrix(), input->getViewMatrix());
+	for (vector<Renderable*>::iterator renderable = renderables.begin(); renderable!=renderables.end(); ++renderable) {
+		(*renderable)->Draw(input->getProjectionMatrix(), input->getViewMatrix());
 	}
+
+	cout << endl;
 
 	glfwSwapBuffers(window);
 

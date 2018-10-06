@@ -28,6 +28,7 @@
             int particleCount;
             bool isNewSystem = true;
             GLuint transformShader;
+		    GLuint vel_vbo, pos2_vbo, col2_vbo, vel2_vbo; 
             GLuint vao2;
     };
 

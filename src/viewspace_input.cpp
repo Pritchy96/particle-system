@@ -16,7 +16,7 @@ mat4 viewMatrix, projectionMatrix;
 float horizontalCameraAngle = 3.14f, verticalCameraAngle = 0.0f, initialCameraFOV = 45.0f;
 int mouseXMax, mouseYMax;
 double mouseXPos, mouseYPos;
-float mouseCoef = 0.00005f;
+float mouseCoef = 0.0001f;
 float translationSpeed = 300.0f; // 3 units / second
 double lastFrameTime;
 double currentFrameTime;
