@@ -61,7 +61,9 @@ int main(int argc, const char* argv[]) {
 
     renderer->addRenderable(new Renderable(basicShader, axis_lines, axis_colours));
     // renderer->addRenderable(new Renderable(basicShader, test_data_lines, test_data_lines));
-    renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(2.0f), 500));
+    renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(2.0f), 30));
+    renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(4.0f), 30));
+
     // renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(2.0f), 500000));
 
     while (true) {  //TODO: Write proper update & exit logic.
