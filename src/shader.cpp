@@ -92,10 +92,8 @@ GLuint Shader::LoadShaders(const char * vertex_file_path, const char * fragment_
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);
 
-	const GLchar* feedbackVaryings[] = { "out_pos" };
-	glTransformFeedbackVaryings(ProgramID, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
- 	glLinkProgram(ProgramID); glUseProgram(ProgramID);
-
+	glLinkProgram(ProgramID); 
+	glUseProgram(ProgramID);
 
 	// Check the program
 	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
@@ -160,9 +158,12 @@ GLuint Shader::LoadTransformShader(const char * path){
 	GLuint ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 
-	const GLchar* feedbackVaryings[] = { "out_pos" };
-	glTransformFeedbackVaryings(ProgramID, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
- 	glLinkProgram(ProgramID); glUseProgram(ProgramID);
+	const GLchar* Varyings[4]; 
+    Varyings[0] = "out_pos";
+    // Varyings[1] = "out_vel";
+
+    glTransformFeedbackVaryings(ProgramID, 1, Varyings, GL_INTERLEAVED_ATTRIBS);//GL_INTERLEAVED_ATTRIBS);
+	// glTransformFeedbackVaryings(ProgramID, 2, feedbackVaryings, GL_SEPARATE_ATTRIBS);
 
 
 	glLinkProgram(ProgramID); 

@@ -1,22 +1,13 @@
-#version 330 core
+#version 330
 
-// Input vertex data, notice it's from "location 0" of the VBO
-layout(location = 0) in vec3 vertexPosition_modelspace;
-//Input vertex colour, Location 1 of VBO as set in VBO init code.
-layout(location = 1) in vec3 vertex_colour;
+layout(location = 0) in vec3 in_pos;
+//layout(location = 3) in vec3 in_vel;
+out vec3 out_pos;
+out vec3 out_vel;
 
-// Output data, interpolated for each fragment.
-out vec3 fragment_colour;
-out float out_pos;
-// Values that stay constant for the whole mesh.
-uniform mat4 MVP;
-uniform mat4 scale;
-
-void main() {
-	// Output position of the vertex, in clip space : MVP * position
-	gl_Position = MVP * scale * vec4(vertexPosition_modelspace,1);
-	out_pos =3.1472f;
-	// The color of each vertex will be interpolated
-	// to produce the color of each fragment
-	fragment_colour = vertex_colour;
+void main(void)
+{
+    vec3 gravity = vec3(0,-.1,0);
+    out_pos = in_pos+(gravity);
+    out_vel = vec3(200, 100, 200);
 }

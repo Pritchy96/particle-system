@@ -29,53 +29,44 @@ ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 
 }
 
 void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
-
 		cout << "Drawing Particle System" << endl;
 
-		glUseProgram(shader);
+		glUseProgram(transformShader);
+
+		GLuint current_vao = getVAO();
+		glBindVertexArray(current_vao);
 
 		//Turn rendering off
-		// glEnable(GL_RASTERIZER_DISCARD);
-		
-		
-		GLuint vao = getVAO();
-		glBindVertexArray(vao);
+		glEnable(GL_RASTERIZER_DISCARD);
+	
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, pos2_vbo);
 
-		GLuint tb_current;
-		glGenBuffers(1, &tb_current);
-		glBindBuffer(GL_ARRAY_BUFFER, tb_current);
-		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size(), nullptr, GL_STATIC_READ);
 
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tb_current);
-		// glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, vel_vbo);
 
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, vertexes.size());
 		glEndTransformFeedback();
-
- 		GLfloat feedback[particleCount];
-		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
- 		int k=0;
-        for(int i=0; i < particleCount; i++) {            
-            cout<<feedback[i]<<" ";
-            k++;
-            if(k==4){cout<<endl; k=0;}
-        }
-
-		// GLfloat feedback[particleCount*4*2];
-		// glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
-
-		// int k=0;
-        // for(int i=0; i < particleCount*6; i++) {            
-        //     cout<<feedback[i] << " ";
-        //     k++;
-        //     if(k==3) {cout<<endl; k=0;}        }
-
-		// cout << endl;
+ 		glBindBuffer(GL_ARRAY_BUFFER,0);
+    	glFlush();
 
 		// //Turn rendering ON
-        // glDisable(GL_RASTERIZER_DISCARD);
+        glEnable(GL_RASTERIZER_DISCARD);
+
+		std::swap(pos_vbo, pos2_vbo);
+
+
+		GLfloat feedback[particleCount*3];
+		glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
+
+		int k=0;
+        for(int i=0; i < particleCount*3; i++) {            
+            cout<<feedback[i] << " ";
+            k++;
+            if(k==3) {cout<<endl; k=0;}        }
+
+		cout << endl;
+
+ 		glBindVertexArray(0);
 
 		// glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -96,66 +87,86 @@ void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 
 GLuint ParticleSystem::getVAO() {
 	if (!validVAO) {
+		cout << "Creating 2 VAOs for Particle System, will call getVAO() for Renderable:" << endl; 
 		//Setup base VAO, with additional Particle system only parameters.
 		GLint vao = Renderable::getVAO();
-		// glBindVertexArray(vao);
+		glBindVertexArray(vao);
 
+		vector<float> verts, cols;
+		for (vector<glm::vec3>::const_iterator point = vertexes.begin(); point!=vertexes.end(); ++point) {
+			verts.push_back(point->x);
+			verts.push_back(point->y);
+			verts.push_back(point->z);
+		}
+
+		for (vector<glm::vec3>::const_iterator colour = colours.begin(); colour!=colours.end(); ++colour) {
+			cols.push_back(colour->x);
+			cols.push_back(colour->y);
+			cols.push_back(colour->z); 
+		}
+
+		glGenBuffers(1, &pos2_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER,pos2_vbo);
+		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER,pos_vbo);
+
+		glBindVertexArray(0);
+		
 		// glEnableVertexAttribArray(2);
 		// glGenBuffers(1, &vel_vbo);
-		// glBindBuffer(GL_ARRAY_BUFFER, vel_vbo);
 		// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	}
 		// glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STREAM_DRAW);
 
-		//Now set up a second VAO for double buffering with Transform Feedback.
-	// 	glGenVertexArrays(1, &vao2);
-	// 	glBindVertexArray(vao2);
+		// Now set up a second VAO for double buffering with Transform Feedback.
+		glGenVertexArrays(1, &vao2);
+		glBindVertexArray(vao2);
 
-	// 	vector<float> verts, cols;
-	// 	for (vector<glm::vec3>::const_iterator point = vertexes.begin(); point!=vertexes.end(); ++point) {
-	// 		verts.push_back(point->x);
-	// 		verts.push_back(point->y);
-	// 		verts.push_back(point->z);
-	// 	}
+		glBindBuffer(GL_ARRAY_BUFFER,pos_vbo);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glBindVertexArray(0);
 
-	// 	for (vector<glm::vec3>::const_iterator colour = colours.begin(); colour!=colours.end(); ++colour) {
-	// 		cols.push_back(colour->x);
-	// 		cols.push_back(colour->y);
-	// 		cols.push_back(colour->z); 
-	// 	}
 
-	// 	glBindBuffer(GL_ARRAY_BUFFER, pos_vbo);
-	// 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	// 	glEnableVertexAttribArray(0);
-	// 	glEnableVertexAttribArray(1);
-	// 	glEnableVertexAttribArray(2);
-	// 	glGenBuffers(1, &pos2_vbo);
-	// 	glGenBuffers(1, &col2_vbo);
-	// 	glGenBuffers(1, &vel2_vbo);
 
-	// 	glBindBuffer(GL_ARRAY_BUFFER, pos2_vbo);
-	// 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	// 	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_DRAW);
+		// glEnableVertexAttribArray(0);
+		// glEnableVertexAttribArray(1);
+		// glEnableVertexAttribArray(2);
+		// glEnableVertexAttribArray(1);
+		// glEnableVertexAttribArray(2);
 
-	// 	glBindBuffer(GL_ARRAY_BUFFER, col2_vbo);
-	// 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	// 	glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STREAM_DRAW);
+		// glGenBuffers(1, &pos2_vbo);
+		// // glGenBuffers(1, &col2_vbo);
 
-	// 	glBindBuffer(GL_ARRAY_BUFFER, vel2_vbo);
-	// 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	// } 
-	
-	// std::swap(vao, vao2);
-	// std::swap(pos_vbo, pos2_vbo);
-	// std::swap(col_vbo, col2_vbo);
-	// std::swap(vel_vbo, vel2_vbo);
+		// glBindBuffer(GL_ARRAY_BUFFER,pos2_vbo);
+		// glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertexes.size() * 3, verts.data(), GL_STATIC_READ);
 
+		// glBindBuffer(GL_ARRAY_BUFFER,pos_vbo);
+		// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+		
+		// glGenBuffers(1, &vel2_vbo);
+
+		// glBindBuffer(GL_ARRAY_BUFFER, pos2_vbo);
+		// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		// glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_READ);
+
+		// glBindBuffer(GL_ARRAY_BUFFER, col2_vbo);
+		// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		// glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STATIC_READ);
+
+		// glBindBuffer(GL_ARRAY_BUFFER, vel2_vbo);
+		// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	}
+		// std::swap(vao, vao2);
+		// std::swap(col_vbo, col2_vbo);
+		// std::swap(vel_vbo, vel2_vbo);
 	
 	return vao;
 }
 
 GLuint ParticleSystem::getPrevVAO() {
 	//This returns the VAO which we don't want to write to with Transform Feedback, i.e the one we're drawing from.
-	return vao;
+	return vao2;
 }

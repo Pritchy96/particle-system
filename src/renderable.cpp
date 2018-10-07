@@ -46,6 +46,9 @@ GLuint Renderable::getVAO() {
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 		glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STATIC_DRAW);
 
+		//Deselect VAO (good practice)
+		glBindVertexArray(0);
+
 		validVAO = true;
 	}
 
