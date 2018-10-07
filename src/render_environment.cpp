@@ -126,7 +126,7 @@ void renderEnvironment::update() {
 		(*renderable)->Draw(input->getProjectionMatrix(), input->getViewMatrix());
 	}
 
-	cout << endl;
+	//cout << endl;
 
 	glfwSwapBuffers(window);
 

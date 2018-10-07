@@ -60,10 +60,11 @@ int main(int argc, const char* argv[]) {
 	GLuint transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
 
     renderer->addRenderable(new Renderable(basicShader, axis_lines, axis_colours));
-    renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(2.0f), 1));
+    // renderer->addRenderable(new Renderable(basicShader, test_data_lines, test_data_lines));
+    renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(2.0f), 500));
+    // renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(2.0f), 500000));
 
-
-    while (true) {  //TODO: Write proper update&exit logic.
+    while (true) {  //TODO: Write proper update & exit logic.
         renderer->update();
     }
 
