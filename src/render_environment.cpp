@@ -16,6 +16,7 @@
 #include "../include/shader.hpp"
 #include "../include/render_environment.hpp"
 #include "../include/renderable.hpp"
+#include "../include/particle_system.hpp"
 #include "../include/viewspace_input.hpp"
 
 using namespace std;
@@ -33,9 +34,6 @@ vec3 initialCameraPos = glm::vec3(10, 10, 10);
 double rotate_y = 0; 
 double rotate_x = 0;
 double rotate_z = 0;
-
-glm::mat4 scaleMatrix = glm::scale(glm::vec3(100.0, 100.0, 100.0));
-
 
 //Blatantly stolen.
 void renderEnvironment::update_fps_counter(GLFWwindow* window) {
@@ -66,6 +64,7 @@ void renderEnvironment::update_fps_counter(GLFWwindow* window) {
 renderEnvironment::renderEnvironment() {
 	//Our ModelViewProjection : multiplication of our 3 matrices
 	if( !glfwInit() ) {
+		// glDrawArrays(GL_POINTS, 0, particle_system
 		fprintf( stderr, "Failed to initialize GLFW\n" );
 	}
 
@@ -78,8 +77,10 @@ renderEnvironment::renderEnvironment() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		// glDrawArrays(GL_POINTS, 0, particle_system
 	
 	window = glfwCreateWindow(gl_width, gl_height, "Particle System", NULL, NULL);
+		// glDrawArrays(GL_POINTS, 0, particle_system
 
 	if( !window ) {
 		fprintf(stderr, "Failed to open GLFW window.\n" );
@@ -91,10 +92,16 @@ renderEnvironment::renderEnvironment() {
 	glfwSetWindowSizeCallback(window, window_size_callback);
 	glfwMakeContextCurrent(window);
 
-	glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	// glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	glClearColor(0.00f, 0.00f, 0.00f, 0.01f);
+
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_PROGRAM_POINT_SIZE);
-	glPointSize(4);
+	glPointSize(2);
+	glLineWidth(4); //This doesn't work?
+
 	glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 
@@ -106,8 +113,12 @@ renderEnvironment::renderEnvironment() {
 	}
 }
 
-void renderEnvironment::addRenderable(Renderable renderable) {
+void renderEnvironment::addRenderable(Renderable* renderable) {
 	renderables.push_back(renderable);
+}
+
+void renderEnvironment::setupTransformShader(GLuint transformShader) {
+	tShader = transformShader;
 }
 
 void renderEnvironment::update() {
@@ -115,19 +126,20 @@ void renderEnvironment::update() {
 	update_fps_counter(window);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (vector<Renderable>::iterator renderable = renderables.begin(); renderable!=renderables.end(); ++renderable) {
-		glm::mat4 MVP = input->getProjectionMatrix() * input->getViewMatrix() * renderable->modelMatrix;
+	vector<Renderable*>::iterator renderable = renderables.begin();
 
-		shaderID = glGetUniformLocation(renderable->shader, "scale");
-		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
-		
-		shaderID = glGetUniformLocation(renderable->shader, "MVP"); 
-		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
-
-		glUseProgram(renderable->shader);
-		glBindVertexArray(renderable->getVAO());
-		glDrawArrays(GL_LINES, 0, renderable->vertexes.size());
+	while(renderable != renderables.end()) {
+		if((*renderable)->isDead) {
+			delete(*renderable);
+			//iterator.erase gives the next item in the list.
+			renderable = renderables.erase(renderable);
+		} else {
+			(*renderable)->Draw(input->getProjectionMatrix(), input->getViewMatrix());
+			++renderable;
+		}
 	}
+
+	//cout << endl;
 
 	glfwSwapBuffers(window);
 

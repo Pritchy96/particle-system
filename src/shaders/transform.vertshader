@@ -1,0 +1,25 @@
+#version 330
+
+layout(location = 0) in vec3 in_pos;
+layout(location = 2) in vec3 in_vel;
+layout(location = 3) in float in_age;
+
+out vec3 out_pos;
+out vec3 out_vel;
+out float out_age;
+
+void main(void)
+{
+    vec3 gravity = vec3(0, -0.1, 0);
+    float slowdown = 0.001;
+
+    if (in_age > 0) {
+        out_vel = in_vel - gravity;
+        out_pos = in_pos - ((out_vel)/20);
+        out_age = in_age - 0.002;
+    } else {
+        out_pos = vec3(0.0f);
+    }
+
+
+}

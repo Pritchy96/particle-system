@@ -2,6 +2,7 @@
 
 layout(location = 0) in vec3 vertexPosition_modelspace;
 layout(location = 1) in vec3 vertex_colour;
+layout(location = 3) in float age;
 
 out vec4 fragment_colour;
 
@@ -11,5 +12,5 @@ uniform mat4 scale;
 
 void main() {
 	gl_Position = MVP * scale * vec4(vertexPosition_modelspace,1);
-	fragment_colour = vec4(vertex_colour, 1.0f);
+	fragment_colour = vec4(vertex_colour, age);
 }

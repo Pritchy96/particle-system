@@ -16,16 +16,16 @@ using namespace std;
 
 GLuint Renderable::getVAO() {
 	if (!validVAO) {
-		cout << "Creating VAO for Renderable" << endl;
+		//cout << "Creating VAO for Renderable" << endl;
 
 		vector<float> verts, cols;
 		for (vector<glm::vec3>::const_iterator point = vertexes.begin(); point!=vertexes.end(); ++point) {
 			verts.push_back(point->x);
 			verts.push_back(point->y);
-			verts.push_back(point->z); 
+			verts.push_back(point->z);
 		}
 
-		for (vector<glm::vec3>::const_iterator colour = vertexes.begin(); colour!=vertexes.end(); ++colour) {
+		for (vector<glm::vec3>::const_iterator colour = colours.begin(); colour!=colours.end(); ++colour) {
 			cols.push_back(colour->x);
 			cols.push_back(colour->y);
 			cols.push_back(colour->z); 
@@ -44,12 +44,30 @@ GLuint Renderable::getVAO() {
 
 		glBindBuffer(GL_ARRAY_BUFFER, col_vbo);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, cols.size() * sizeof(float), cols.data(), GL_STATIC_DRAW);
+
+		//Deselect VAO (good practice)
+		glBindVertexArray(0);
 
 		validVAO = true;
 	}
 
 	return vao;
+}
+
+void Renderable::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix){
+		glUseProgram(shader);
+
+		GLuint shaderID = glGetUniformLocation(shader, "scale");
+		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
+		
+		//TODO: Pass through and do multiplication GPU side?
+		glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+		shaderID = glGetUniformLocation(shader, "MVP"); 
+		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
+
+		glBindVertexArray(getVAO());
+		glDrawArrays(GL_LINES, 0, vertexes.size());
 }
 
 Renderable::Renderable(GLuint Shader) {
@@ -62,7 +80,6 @@ Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data) {
 
 	vertexes = vert_data;
 	colours = vert_data;
-
 }
 
 Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data) {
@@ -70,7 +87,4 @@ Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::v
 
 	vertexes = vert_data;
 	colours = colour_data;
-
 }
-
-
