@@ -57,17 +57,17 @@ int main(int argc, const char* argv[]) {
     cout << "Initialised renderer" << endl;
 
 	GLuint basicShader = Shader::LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
+	GLuint particleShader = Shader::LoadShaders("./bin/shaders/particle.vertshader", "./bin/shaders/basic.fragshader");
 	GLuint transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
 
     renderer->addRenderable(new Renderable(basicShader, axis_lines, axis_colours));
 	
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 1500; i++) {
 		glm::vec3 origin = vec3( ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000);
-		renderer->addRenderable(new ParticleSystem(basicShader, transformShader, origin, 400));
+		renderer->addRenderable(new ParticleSystem(particleShader, transformShader, origin, 400));
 	}
 
-
-
+	// cout << GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS << endl;
 	// renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(0.0f), 200000));
 	
 

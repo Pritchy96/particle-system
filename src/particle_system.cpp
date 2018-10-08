@@ -20,6 +20,7 @@ ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 
 
 	transformShader = TransformShader;
 	particleCount = numberOfParticles;
+	age = 100.0f;
 
     modelMatrix = glm::translate(mat4(1.0f), origin);
 
@@ -32,6 +33,7 @@ ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 
 }
 
 void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
+
 		//cout << "Drawing Particle System" << endl;
 
 		glUseProgram(transformShader);
@@ -43,6 +45,7 @@ void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 	
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, pos2_vbo);
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, vel2_vbo);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, age2_vbo);
 
 		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, vertexes.size());
@@ -80,9 +83,13 @@ void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 		shaderID = glGetUniformLocation(shader, "MVP"); 
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
 
-
 		// glDrawTransformFeedback(GL_POINTS, tbuf);
 		glDrawArrays(GL_POINTS, 0, particleCount);
+
+		age -= 0.1f;
+		if (age <= 0.0f) {
+			isDead = true;
+		}
 }
 
 GLuint ParticleSystem::getVAO() {
@@ -92,31 +99,31 @@ GLuint ParticleSystem::getVAO() {
 		GLint vao = Renderable::getVAO();
 		glBindVertexArray(vao);
 
-		vector<float> verts, cols, vels;
-		for (vector<glm::vec3>::const_iterator point = vertexes.begin(); point!=vertexes.end(); ++point) {
-			verts.push_back(point->x);
-			verts.push_back(point->y);
-			verts.push_back(point->z);
-		}
-
-		for (vector<glm::vec3>::const_iterator colour = colours.begin(); colour!=colours.end(); ++colour) {
-			cols.push_back(colour->x);
-			cols.push_back(colour->y);
-			cols.push_back(colour->z); 
-		}
+		vector<float> verts, cols, vels, ages;
 
 		for (int i = 0; i < particleCount; i++) {
-			// cout << (((double) rand() / (RAND_MAX/2))-1) <<endl;
-			vec3 vel = glm::sphericalRand(2 + ((double) rand() / (RAND_MAX) / 5));
+			cols.push_back(colours[i].x);
+			cols.push_back(colours[i].y);
+			cols.push_back(colours[i].z);
 
+			verts.push_back(vertexes[i].x);
+			verts.push_back(vertexes[i].y);
+			verts.push_back(vertexes[i].z);
+			
+			vec3 vel = glm::sphericalRand(2 + ((double) rand() / (RAND_MAX) / 5));
 			vels.push_back(vel.x);
 			vels.push_back(vel.y);
 			vels.push_back(vel.z);
+
+			//Slightly randomise particle timouts
+			ages.push_back((age/100.0f)-((float) rand() / RAND_MAX));
 		}
 
 		glGenBuffers(1, &pos2_vbo);
 		glGenBuffers(1, &vel_vbo);
 		glGenBuffers(1, &vel2_vbo);
+		glGenBuffers(1, &age_vbo);
+		glGenBuffers(1, &age2_vbo);
 
 		glBindBuffer(GL_ARRAY_BUFFER,pos2_vbo);	//Bind and allocate pos2 buffer.
 		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_COPY);
@@ -130,6 +137,15 @@ GLuint ParticleSystem::getVAO() {
 		glBindBuffer(GL_ARRAY_BUFFER, vel2_vbo);	//Bind and allocate vel2 buffer.
 		glBufferData(GL_ARRAY_BUFFER, vels.size() * sizeof(float), vels.data(), GL_STATIC_COPY);
 		glBindBuffer(GL_ARRAY_BUFFER, vel_vbo);	//Rebind vel1 buffer.
+
+		glBindBuffer(GL_ARRAY_BUFFER, age_vbo);
+		glEnableVertexAttribArray(3);
+		glBufferData(GL_ARRAY_BUFFER, ages.size() * sizeof(float), ages.data(), GL_STATIC_COPY);
+		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, age2_vbo);	//Bind and allocate age2 buffer.
+		glBufferData(GL_ARRAY_BUFFER, ages.size() * sizeof(float), ages.data(), GL_STATIC_COPY);
+		glBindBuffer(GL_ARRAY_BUFFER, age_vbo);	//Rebind age1 buffer.
 
 		glBindVertexArray(0);
 		
@@ -145,22 +161,38 @@ GLuint ParticleSystem::getVAO() {
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-
 		glBindBuffer(GL_ARRAY_BUFFER, vel_vbo);
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, age_vbo);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, NULL);
 
 		glBindVertexArray(0);
 	}
 	
 	std::swap(pos_vbo, pos2_vbo);
 	std::swap(vel_vbo, vel2_vbo);
+	std::swap(age_vbo, age2_vbo);
 
-	
 	return vao;
 }
 
 GLuint ParticleSystem::getPrevVAO() {
 	//This returns the VAO which we don't want to write to with Transform Feedback, i.e the one we're drawing from.
 	return vao2;
+}
+
+ParticleSystem::~ParticleSystem() {
+	cout << "Deleting Particle System" << endl;
+	//I'm convinced this is definitely by far the best way of doing this (/s)
+	glDeleteBuffers(1, &pos_vbo);
+	glDeleteBuffers(1, &pos2_vbo);
+	glDeleteBuffers(1, &col_vbo);
+	glDeleteBuffers(1, &col2_vbo);
+	glDeleteBuffers(1, &age_vbo);
+	glDeleteBuffers(1, &age2_vbo);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteVertexArrays(1, &vao2);
 }

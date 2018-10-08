@@ -95,11 +95,11 @@ renderEnvironment::renderEnvironment() {
 	// glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
 	glClearColor(0.00f, 0.00f, 0.00f, 0.0f);
 
-	
-
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_PROGRAM_POINT_SIZE);
-	glPointSize(4);
+	glPointSize(1);
 	glLineWidth(4); //This doesn't work?
 
 	glEnable(GL_CULL_FACE);
@@ -126,8 +126,17 @@ void renderEnvironment::update() {
 	update_fps_counter(window);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (vector<Renderable*>::iterator renderable = renderables.begin(); renderable!=renderables.end(); ++renderable) {
-		(*renderable)->Draw(input->getProjectionMatrix(), input->getViewMatrix());
+	vector<Renderable*>::iterator renderable = renderables.begin();
+
+	while(renderable != renderables.end()) {
+		if((*renderable)->isDead) {
+			delete(*renderable);
+			//iterator.erase gives the next item in the list.
+			renderable = renderables.erase(renderable);
+		} else {
+			(*renderable)->Draw(input->getProjectionMatrix(), input->getViewMatrix());
+			++renderable;
+		}
 	}
 
 	//cout << endl;
