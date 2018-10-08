@@ -20,7 +20,7 @@ ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 
 
 	transformShader = TransformShader;
 	particleCount = numberOfParticles;
-	age = 100.0f;
+	age = 40.0f;
 
     modelMatrix = glm::translate(mat4(1.0f), origin);
 
@@ -110,7 +110,7 @@ GLuint ParticleSystem::getVAO() {
 			verts.push_back(vertexes[i].y);
 			verts.push_back(vertexes[i].z);
 			
-			vec3 vel = glm::sphericalRand(2 + ((double) rand() / (RAND_MAX) / 5));
+			vec3 vel = glm::sphericalRand(4 + ((double) rand() / (RAND_MAX) / 5));
 			vels.push_back(vel.x);
 			vels.push_back(vel.y);
 			vels.push_back(vel.z);

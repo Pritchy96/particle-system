@@ -93,13 +93,13 @@ renderEnvironment::renderEnvironment() {
 	glfwMakeContextCurrent(window);
 
 	// glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
-	glClearColor(0.00f, 0.00f, 0.00f, 0.0f);
+	glClearColor(0.00f, 0.00f, 0.00f, 0.01f);
 
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_PROGRAM_POINT_SIZE);
-	glPointSize(1);
+	glPointSize(2);
 	glLineWidth(4); //This doesn't work?
 
 	glEnable(GL_CULL_FACE);

@@ -10,7 +10,7 @@ out float out_age;
 
 void main(void)
 {
-    vec3 gravity = vec3(0, -0.05, 0);
+    vec3 gravity = vec3(0, -0.1, 0);
     float slowdown = 0.001;
 
     if (in_age > 0) {
