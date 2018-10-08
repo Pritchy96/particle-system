@@ -30,7 +30,7 @@
             float age;
             bool isNewSystem = true;
             GLuint transformShader;
-		    GLuint vel_vbo, pos2_vbo, col2_vbo, vel2_vbo, age_vbo, age2_vbo; 
+		        GLuint vel_vbo, pos2_vbo, col2_vbo, vel2_vbo, age_vbo, age2_vbo; 
             GLuint vao2;
     };
 
