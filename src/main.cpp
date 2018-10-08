@@ -48,9 +48,9 @@ vector<vec3> test_data_lines = {
 	vec3(5.693254, 14.517317, 1.00000)
 };
 
-unsigned ShaderIds[5] = { 0u };
-
 int main(int argc, const char* argv[]) {
+
+	srand (time(NULL));
     cout << "Launching Program" << endl;
 
     renderEnvironment *renderer = new renderEnvironment();
@@ -60,11 +60,16 @@ int main(int argc, const char* argv[]) {
 	GLuint transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
 
     renderer->addRenderable(new Renderable(basicShader, axis_lines, axis_colours));
-    // renderer->addRenderable(new Renderable(basicShader, test_data_lines, test_data_lines));
-    renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(2.0f), 30));
-    renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(4.0f), 30));
+	
+	for (int i = 0; i < 1000; i++) {
+		glm::vec3 origin = vec3( ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000);
+		renderer->addRenderable(new ParticleSystem(basicShader, transformShader, origin, 400));
+	}
 
-    // renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(2.0f), 500000));
+
+
+	// renderer->addRenderable(new ParticleSystem(basicShader, transformShader, vec3(0.0f), 200000));
+	
 
     while (true) {  //TODO: Write proper update & exit logic.
         renderer->update();

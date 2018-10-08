@@ -19,6 +19,7 @@
             ParticleSystem();
             ParticleSystem(GLuint Shader, GLuint TransformShader);
             ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 origin, int numberOfParticles);
+            
             virtual ~ParticleSystem() = default;
             
             void Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) override;            

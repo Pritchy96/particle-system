@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/random.hpp>
 
 #include "../include/particle_system.hpp"
 
@@ -22,9 +23,11 @@ ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 
 
     modelMatrix = glm::translate(mat4(1.0f), origin);
 
+	vec3 baseCol = vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX, (float) rand() / RAND_MAX);
+
     for (int i = 0; i < numberOfParticles; i++) {
         vertexes.push_back(vec3(0.0f)); //Init all new particles at emitter origin.
-        colours.push_back(vec3(0.4f, 1.0f, 0.3f));
+        colours.push_back(baseCol + vec3(((float) rand() / RAND_MAX) / 4 - 0.25, ((float) rand() / RAND_MAX) / 4 - 0.25, ((float) rand() / RAND_MAX) / 4 - 0.25));
     }
 }
 
@@ -65,6 +68,10 @@ void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 
  		glBindVertexArray(0);	//Unbind buffers (best practice)
 
+		glBindVertexArray(getPrevVAO());	//Draw from the other VAO.
+
+		glUseProgram(shader);
+
 		glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
 
 		GLuint shaderID = glGetUniformLocation(shader, "scale");
@@ -73,8 +80,6 @@ void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 		shaderID = glGetUniformLocation(shader, "MVP"); 
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
 
-		glBindVertexArray(getPrevVAO());	//Draw from the other VAO.
-		glUseProgram(shader);
 
 		// glDrawTransformFeedback(GL_POINTS, tbuf);
 		glDrawArrays(GL_POINTS, 0, particleCount);
@@ -82,7 +87,7 @@ void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 
 GLuint ParticleSystem::getVAO() {
 	if (!validVAO) {
-		cout << "Creating 2 VAOs for Particle System, will call getVAO() for Renderable to set up first VAO:" << endl; 
+		//cout << "Creating 2 VAOs for Particle System, will call getVAO() for Renderable to set up first VAO:" << endl; 
 		//Setup base VAO, with additional Particle system only parameters.
 		GLint vao = Renderable::getVAO();
 		glBindVertexArray(vao);
@@ -101,9 +106,12 @@ GLuint ParticleSystem::getVAO() {
 		}
 
 		for (int i = 0; i < particleCount; i++) {
-			vels.push_back(((double) rand() / (RAND_MAX)));
-			vels.push_back(((double) rand() / (RAND_MAX)));
-			vels.push_back(((double) rand() / (RAND_MAX))); 
+			// cout << (((double) rand() / (RAND_MAX/2))-1) <<endl;
+			vec3 vel = glm::sphericalRand(2 + ((double) rand() / (RAND_MAX) / 5));
+
+			vels.push_back(vel.x);
+			vels.push_back(vel.y);
+			vels.push_back(vel.z);
 		}
 
 		glGenBuffers(1, &pos2_vbo);
@@ -132,6 +140,11 @@ GLuint ParticleSystem::getVAO() {
 		glBindBuffer(GL_ARRAY_BUFFER, pos_vbo);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, col_vbo);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
 
 		glBindBuffer(GL_ARRAY_BUFFER, vel_vbo);
 		glEnableVertexAttribArray(2);

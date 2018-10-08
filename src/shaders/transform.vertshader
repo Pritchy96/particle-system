@@ -7,7 +7,18 @@ out vec3 out_vel;
 
 void main(void)
 {
-    vec3 gravity = vec3(0,-.5,0);
-    out_pos = in_pos+gravity+(in_vel/10);
-    out_vel = in_vel / 1.001;
+    vec3 gravity = vec3(0, -0.02, 0);
+    float slowdown = 0.001;
+
+    // if (in_vel.x > 0) { out_vel.x = in_vel.x - slowdown; }
+    // if (in_vel.x < 0) { out_vel.x = in_vel.x + slowdown; }
+
+    // if (in_vel.y > 0) { out_vel.y = in_vel.y - slowdown; }
+    // if (in_vel.y < 9) { out_vel.y = in_vel.y + slowdown; }  //Terminal Velocity
+
+    // if (in_vel.z > 0) { out_vel.z = in_vel.z - slowdown; }
+    // if (in_vel.z < 0) { out_vel.z = in_vel.z + slowdown; }
+
+    out_vel = in_vel - gravity;
+    out_pos = in_pos - ((out_vel)/10);
 }

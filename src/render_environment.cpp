@@ -92,7 +92,11 @@ renderEnvironment::renderEnvironment() {
 	glfwSetWindowSizeCallback(window, window_size_callback);
 	glfwMakeContextCurrent(window);
 
-	glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	// glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
+	glClearColor(0.00f, 0.00f, 0.00f, 0.0f);
+
+	
+
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glPointSize(4);

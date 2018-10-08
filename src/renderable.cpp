@@ -16,7 +16,7 @@ using namespace std;
 
 GLuint Renderable::getVAO() {
 	if (!validVAO) {
-		cout << "Creating VAO for Renderable" << endl;
+		//cout << "Creating VAO for Renderable" << endl;
 
 		vector<float> verts, cols;
 		for (vector<glm::vec3>::const_iterator point = vertexes.begin(); point!=vertexes.end(); ++point) {
@@ -56,15 +56,16 @@ GLuint Renderable::getVAO() {
 }
 
 void Renderable::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix){
-		glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+		glUseProgram(shader);
 
 		GLuint shaderID = glGetUniformLocation(shader, "scale");
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
 		
+		//TODO: Pass through and do multiplication GPU side?
+		glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
 		shaderID = glGetUniformLocation(shader, "MVP"); 
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
 
-		glUseProgram(shader);
 		glBindVertexArray(getVAO());
 		glDrawArrays(GL_LINES, 0, vertexes.size());
 }
