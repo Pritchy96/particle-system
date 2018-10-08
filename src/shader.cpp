@@ -158,14 +158,13 @@ GLuint Shader::LoadTransformShader(const char * path){
 	GLuint ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 
-	const GLchar* Varyings[4]; 
+	const GLchar* Varyings[4];
     Varyings[0] = "out_pos";
     Varyings[1] = "out_vel";
+    Varyings[2] = "out_age";
 
-	
-	glTransformFeedbackVaryings(ProgramID, 2, Varyings, GL_SEPARATE_ATTRIBS);
+	glTransformFeedbackVaryings(ProgramID, 3, Varyings, GL_SEPARATE_ATTRIBS);
     // glTransformFeedbackVaryings(ProgramID, 1, Varyings, GL_INTERLEAVED_ATTRIBS);
-
 
 	glLinkProgram(ProgramID); 
 	glUseProgram(ProgramID);

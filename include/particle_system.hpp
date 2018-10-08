@@ -20,16 +20,17 @@
             ParticleSystem(GLuint Shader, GLuint TransformShader);
             ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 origin, int numberOfParticles);
             
-            virtual ~ParticleSystem() = default;
+            virtual ~ParticleSystem();
             
             void Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) override;            
             GLuint getVAO() override;
             GLuint getPrevVAO();
 
             int particleCount;
+            float age;
             bool isNewSystem = true;
             GLuint transformShader;
-		    GLuint vel_vbo, pos2_vbo, col2_vbo, vel2_vbo; 
+		    GLuint vel_vbo, pos2_vbo, col2_vbo, vel2_vbo, age_vbo, age2_vbo; 
             GLuint vao2;
     };
 
