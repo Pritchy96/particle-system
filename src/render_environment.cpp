@@ -80,23 +80,20 @@ void renderEnvironment::setFPSCounter(GLFWwindow* window, double deltaT) {
 renderEnvironment::renderEnvironment() {
 	//Our ModelViewProjection : multiplication of our 3 matrices
 	if( !glfwInit() ) {
-		// glDrawArrays(GL_POINTS, 0, particle_system
 		fprintf( stderr, "Failed to initialize GLFW\n" );
 	}
 
-	glfwSetErrorCallback(error_callback);
+	glfwSetErrorCallback(errorCallback);
 
 	input = new viewspaceManipulator(window, initialCameraPos);
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //For MacOS compat, apparrently 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		// glDrawArrays(GL_POINTS, 0, particle_system
 	
 	window = glfwCreateWindow(gl_width, gl_height, "Particle System", NULL, NULL);
-		// glDrawArrays(GL_POINTS, 0, particle_system
 
 	if( !window ) {
 		fprintf(stderr, "Failed to open GLFW window.\n" );
@@ -105,7 +102,7 @@ renderEnvironment::renderEnvironment() {
 
 	glfwSetKeyCallback(window, input->key_callback);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-	glfwSetWindowSizeCallback(window, window_size_callback);
+	glfwSetWindowSizeCallback(window, windowSizeCallback);
 	glfwMakeContextCurrent(window);
 
 	glClearColor(0.00f, 0.00f, 0.00f, 0.01f);
@@ -117,7 +114,7 @@ renderEnvironment::renderEnvironment() {
 	glLineWidth(4); //This doesn't work?
 
 	glEnable(GL_CULL_FACE);
-	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
+	glDepthFunc(GL_LESS); //Depth-testing interprets a smaller value as "closer"
 
 	// Initialize GLEW
 	glewExperimental = true; // Needed for core profile
@@ -173,11 +170,11 @@ renderEnvironment::~renderEnvironment() {
 	exit(EXIT_SUCCESS);
 }
 
-void renderEnvironment::error_callback(int error, const char* description) {
-	fputs(description, stderr);	//Error logging stuff
+void renderEnvironment::errorCallback(int error, const char* description) {
+	fprintf(stderr, description);
 }
 
-void renderEnvironment::window_size_callback(GLFWwindow* window, int width, int height) {
+void renderEnvironment::windowSizeCallback(GLFWwindow* window, int width, int height) {
 	gl_height = height;
 	gl_width = width;
 	glViewport(0, 0, gl_width, gl_height);
