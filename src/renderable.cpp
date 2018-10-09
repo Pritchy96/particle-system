@@ -55,7 +55,7 @@ GLuint Renderable::getVAO() {
 	return vao;
 }
 
-void Renderable::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix){
+void Renderable::Draw(float deltaT, glm::mat4 projectionMatrix, glm::mat4 viewMatrix){
 		glUseProgram(shader);
 
 		GLuint shaderID = glGetUniformLocation(shader, "scale");

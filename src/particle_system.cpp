@@ -32,7 +32,7 @@ ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 
     }
 }
 
-void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
+void ParticleSystem::Draw(float deltaT, glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 
 		//cout << "Drawing Particle System" << endl;
 
@@ -40,6 +40,13 @@ void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 
 		GLuint current_vao = getVAO();
 		glBindVertexArray(current_vao);
+
+		GLuint shaderID = glGetUniformLocation(transformShader, "deltaT"); 
+		glUniform1f(shaderID, deltaT);
+
+		shaderID = glGetUniformLocation(transformShader, "wind");
+		glUniform3fv(shaderID, 1, &vec3(0.02f, 0.01f, 0.0f)[0]);
+		
 
 		glEnable(GL_RASTERIZER_DISCARD);	//Turn rendering off
 	
@@ -77,7 +84,7 @@ void ParticleSystem::Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) {
 
 		glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
 
-		GLuint shaderID = glGetUniformLocation(shader, "scale");
+		shaderID = glGetUniformLocation(shader, "scale");
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &scaleMatrix[0][0]);
 		
 		shaderID = glGetUniformLocation(shader, "MVP"); 
@@ -185,7 +192,7 @@ GLuint ParticleSystem::getPrevVAO() {
 }
 
 ParticleSystem::~ParticleSystem() {
-	cout << "Deleting Particle System" << endl;
+	// cout << "Deleting Particle System" << endl;
 	//I'm convinced this is definitely by far the best way of doing this (/s)
 	glDeleteBuffers(1, &pos_vbo);
 	glDeleteBuffers(1, &pos2_vbo);

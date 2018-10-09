@@ -19,11 +19,11 @@
             renderEnvironment();
             ~renderEnvironment();
             void addRenderable(Renderable* renderable);
-            void update();
+            void update(float deltaT);
             void setupTransformShader(GLuint transformShader);   
             static void error_callback(int error, const char* description);
             static void window_size_callback(GLFWwindow* window, int width, int height);
-            static void update_fps_counter(GLFWwindow* window);
+            static void setFPSCounter(GLFWwindow* window, double deltaT);
             
             vector<Renderable*> renderables;
             GLuint tShader;      

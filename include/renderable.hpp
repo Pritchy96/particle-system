@@ -24,7 +24,7 @@
 
             virtual GLuint getVAO();
 
-            virtual void Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
+            virtual void Draw(float deltaT, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
 
             vector<vec3> vertexes, colours;
 	        GLuint pos_vbo, col_vbo, vao, shader;

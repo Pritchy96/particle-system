@@ -22,7 +22,7 @@
             
             virtual ~ParticleSystem();
             
-            void Draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix) override;            
+            void Draw(float deltaT, glm::mat4 projectionMatrix, glm::mat4 viewMatrix) override;            
             GLuint getVAO() override;
             GLuint getPrevVAO();
 

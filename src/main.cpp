@@ -17,24 +17,6 @@
 using namespace std;
 using namespace boost;
 
-vector<vec3> axis_lines = {
-    vec3(0.0f, 0.0f, 0.0f),
-	vec3(100.0f, 0.0f, 0.0f),
-	vec3(0.0f, 0.0f, 0.0f),
-	vec3(0.0f, 100.0f, 0.0f),    
-	vec3(0.0f, 0.0f, 0.0f),
-	vec3(0.0f, 0.0f, 100.0f)
-};
-
-vector<vec3> axis_colours = {
-    vec3(1.0f, 0.0f, 0.0f),
-	vec3(1.0f, 0.0f, 0.0f),
-	vec3(0.0f, 1.0f, 0.0f),    
-	vec3(0.0f, 1.0f, 0.0f),
-	vec3(0.0f, 0.0f, 1.0f),
-	vec3(0.0f, 0.0f, 1.0f)
-};
-
 vector<vec3> test_data_lines = {
 	vec3(0.000000, 4.000000, 12.000000),
 	vec3(2.870316, -101.411970, 1.000000),
@@ -60,34 +42,22 @@ int main(int argc, const char* argv[]) {
     renderEnvironment *renderer = new renderEnvironment();
     cout << "Initialised renderer" << endl;
 
-	GLuint basicShader = Shader::LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
 	GLuint particleShader = Shader::LoadShaders("./bin/shaders/particle.vertshader", "./bin/shaders/basic.fragshader");
 	GLuint transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
-
-    // renderer->addRenderable(new Renderable(basicShader, axis_lines, axis_colours));
-	
-
-
-
-	// for (int i = 0; i < 1500; i++) {
-	// 	glm::vec3 origin = vec3( ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000);
-	// 	renderer->addRenderable(new ParticleSystem(particleShader, transformShader, origin, 400));
-	// }
 	
     while (true) {  //TODO: Write proper update & exit logic.
 		oldTime = newTime;
     	newTime = chrono::steady_clock::now();
 		deltaT = chrono::duration_cast<chrono::milliseconds>(newTime - oldTime).count();
 
-		for (int i = 0; i < 2; i++) {	//Can spawn two emitters per update.
+		for (int i = 0; i < 4; i++) {	//Can spawn n emitters per update.
 			if (renderer->renderables.size() < 1500) {
 				glm::vec3 origin = vec3( ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000);
 				renderer->addRenderable(new ParticleSystem(particleShader, transformShader, origin, 400));			
 			}
 		}
 
-		cout << "delta: " << deltaT << endl;
-        renderer->update();
+        renderer->update(deltaT);
     }
 
     return 0;

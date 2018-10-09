@@ -35,30 +35,46 @@ double rotate_y = 0;
 double rotate_x = 0;
 double rotate_z = 0;
 
-//Blatantly stolen.
-void renderEnvironment::update_fps_counter(GLFWwindow* window) {
-	//Get time.
-	static double previous_seconds = glfwGetTime();
-	static int frame_count;
-	//Get time again.
-	double current_seconds = glfwGetTime();
-	//Get time difference.
-	double elapsed_seconds = current_seconds - previous_seconds;
+double timeElapsed = 0;
+int framesElapsed = 0;
 
-	//If it's more than a quarter of a second, update fps. 
-	//This is to stop it jumping around too much by averaging the fps over 0.25 of a second.
-	if (elapsed_seconds > 0.25) {
-		previous_seconds = current_seconds;
-		double fps = (double)frame_count / elapsed_seconds;
+Renderable* renderAxis;
+
+GLuint basicShader;
+
+vector<vec3> axis_lines = {
+    vec3(0.0f, 0.0f, 0.0f),
+	vec3(100.0f, 0.0f, 0.0f),
+	vec3(0.0f, 0.0f, 0.0f),
+	vec3(0.0f, 100.0f, 0.0f),    
+	vec3(0.0f, 0.0f, 0.0f),
+	vec3(0.0f, 0.0f, 100.0f)
+};
+
+vector<vec3> axis_colours = {
+    vec3(1.0f, 0.0f, 0.0f),
+	vec3(1.0f, 0.0f, 0.0f),
+	vec3(0.0f, 1.0f, 0.0f),    
+	vec3(0.0f, 1.0f, 0.0f),
+	vec3(0.0f, 0.0f, 1.0f),
+	vec3(0.0f, 0.0f, 1.0f)
+};
+
+void renderEnvironment::setFPSCounter(GLFWwindow* window, double deltaT) {
+	timeElapsed += deltaT;
+	framesElapsed++;
+
+	//If it's more than a quarter of a second, update fps.
+	if (timeElapsed > 250) {
+		double fps = (double)(framesElapsed / timeElapsed) * 1000;
 		char tmp[128];
 		//Write formatted data to tmp string.
-		// sprintf_s(tmp, "opengl renderer @ fps: %.2f", fps);
-		snprintf(tmp, sizeof(tmp)/sizeof(char), "opengl renderer @ fps: %.2f", fps);
+		snprintf(tmp, sizeof(tmp)/sizeof(char), "Particle System @ %.2f FPS", fps);
 		//Set window title to string.
 		glfwSetWindowTitle(window, tmp);
-		frame_count = 0;
+		framesElapsed = 0;
+		timeElapsed = 0;
 	}
-	frame_count++;
 }
 
 renderEnvironment::renderEnvironment() {
@@ -92,9 +108,7 @@ renderEnvironment::renderEnvironment() {
 	glfwSetWindowSizeCallback(window, window_size_callback);
 	glfwMakeContextCurrent(window);
 
-	// glClearColor(0.7f, 0.7f, 0.7f, 0.0f);
 	glClearColor(0.00f, 0.00f, 0.00f, 0.01f);
-
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -111,19 +125,25 @@ renderEnvironment::renderEnvironment() {
 		fprintf(stderr, "Failed to initialize GLEW\n");
 		glfwTerminate();
 	}
+	
+	basicShader = Shader::LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
+    renderAxis = new Renderable(basicShader, axis_lines, axis_colours);
+	addRenderable(renderAxis);
+
 }
 
 void renderEnvironment::addRenderable(Renderable* renderable) {
 	renderables.push_back(renderable);
 }
 
+
 void renderEnvironment::setupTransformShader(GLuint transformShader) {
 	tShader = transformShader;
 }
 
-void renderEnvironment::update() {
+void renderEnvironment::update(float deltaT) {
 	input->update(window);
-	update_fps_counter(window);
+	setFPSCounter(window, deltaT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	vector<Renderable*>::iterator renderable = renderables.begin();
@@ -134,7 +154,7 @@ void renderEnvironment::update() {
 			//iterator.erase gives the next item in the list.
 			renderable = renderables.erase(renderable);
 		} else {
-			(*renderable)->Draw(input->getProjectionMatrix(), input->getViewMatrix());
+			(*renderable)->Draw(deltaT, input->getProjectionMatrix(), input->getViewMatrix());
 			++renderable;
 		}
 	}
