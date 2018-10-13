@@ -9,7 +9,6 @@
     #include <glm/glm.hpp>
     #include <glm/gtc/matrix_transform.hpp>
     #include "../include/renderable.hpp"
-    #include "../include/particle_system.hpp"
 
     using namespace glm;
     using namespace std;

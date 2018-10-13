@@ -16,7 +16,6 @@
 #include "../include/shader.hpp"
 #include "../include/render_environment.hpp"
 #include "../include/renderable.hpp"
-#include "../include/particle_system.hpp"
 #include "../include/viewspace_input.hpp"
 
 using namespace std;
@@ -93,7 +92,7 @@ renderEnvironment::renderEnvironment() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //For MacOS compat, apparrently 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
-	window = glfwCreateWindow(gl_width, gl_height, "Particle System", NULL, NULL);
+	window = glfwCreateWindow(gl_width, gl_height, "Render Window", NULL, NULL);
 
 	if( !window ) {
 		fprintf(stderr, "Failed to open GLFW window.\n" );
