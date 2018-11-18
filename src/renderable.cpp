@@ -67,24 +67,28 @@ void Renderable::Draw(float deltaT, glm::mat4 projectionMatrix, glm::mat4 viewMa
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
 
 		glBindVertexArray(getVAO());
-		glDrawArrays(GL_LINES, 0, vertexes.size());
+		glDrawArrays(renderType, 0, vertexes.size());
 }
 
-Renderable::Renderable(GLuint Shader) {
+Renderable::Renderable(GLuint Shader, GLuint renderPrimative) {
 	shader = Shader;
+	renderType = renderPrimative;
 }
 
 //Uses Vert Data as placeholder Colour data too
-Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data) {
+Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, GLuint renderPrimative) {
 	shader = Shader;
 
 	vertexes = vert_data;
 	colours = vert_data;
+	renderType = renderPrimative;
 }
 
-Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data) {
+Renderable::Renderable(GLuint Shader, vector<glm::vec3> vert_data, vector<glm::vec3> colour_data, GLuint renderPrimative) {
 	shader = Shader;
 
 	vertexes = vert_data;
 	colours = colour_data;
+	renderType = renderPrimative;
+
 }
