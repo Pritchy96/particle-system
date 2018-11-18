@@ -15,8 +15,8 @@
 using namespace glm;
 using namespace std;
 
-ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 origin, int numberOfParticles)
-: Renderable(Shader) {
+ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 origin, int numberOfParticles, GLuint renderType)
+: Renderable(Shader, renderType) {
 
 	transformShader = TransformShader;
 	particleCount = numberOfParticles;
@@ -54,32 +54,15 @@ void ParticleSystem::Draw(float deltaT, glm::mat4 projectionMatrix, glm::mat4 vi
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, vel2_vbo);
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, age2_vbo);
 
-		glBeginTransformFeedback(GL_POINTS);
-		glDrawArrays(GL_POINTS, 0, vertexes.size());
+		glBeginTransformFeedback(renderType);
+		glDrawArrays(renderType, 0, vertexes.size());
 		glEndTransformFeedback();
  		glBindBuffer(GL_ARRAY_BUFFER,0);	//Unbind buffer (best practice)
 
 		// //Turn rendering ON
         glDisable(GL_RASTERIZER_DISCARD);
-
-		// int feedbackLength = particleCount*3*2;
-		// GLfloat feedback[feedbackLength];
-		// glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, sizeof(feedback), feedback);
-
-		// int k=0;
-        // for(int i=0; i < feedbackLength; i++) {            
-        //     cout<<feedback[i] << " ";
-        //     k++;
-        //     if(k==3) {
-		// 		cout<<endl; k=0;   
-		// 		}
-		// }
-		// cout << endl;
-
  		glBindVertexArray(0);	//Unbind buffers (best practice)
-
 		glBindVertexArray(getPrevVAO());	//Draw from the other VAO.
-
 		glUseProgram(shader);
 
 		glm::mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
@@ -91,7 +74,7 @@ void ParticleSystem::Draw(float deltaT, glm::mat4 projectionMatrix, glm::mat4 vi
 		glUniformMatrix4fv(shaderID, 1, GL_FALSE, &MVP[0][0]);
 
 		// glDrawTransformFeedback(GL_POINTS, tbuf);
-		glDrawArrays(GL_POINTS, 0, particleCount);
+		glDrawArrays(renderType, 0, particleCount);
 
 		age -= 0.1f;
 		if (age <= 0.0f) {

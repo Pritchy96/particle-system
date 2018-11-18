@@ -73,8 +73,7 @@ void viewspaceManipulator::update(GLFWwindow *window){
 
 	float currentTranslationSpeed = translationSpeed;
 
-	//Zoomies
-	// Move forward
+	// Speed modifier
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
 		currentTranslationSpeed *= 2;
 	}
@@ -121,26 +120,3 @@ void viewspaceManipulator::update(GLFWwindow *window){
 	lastFrameTime = currentFrameTime;
 }
 	
-void viewspaceManipulator::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	switch (key) {
-	case(GLFW_KEY_ESCAPE) :
-		exit(0);
-		break;
-
-	case(GLFW_KEY_V) :
-		if (action == GLFW_PRESS) {
-			GLint mode[2];
-			glGetIntegerv(GL_POLYGON_MODE, mode);
-			if (mode[0] == GL_LINE) {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				fprintf( stdout, "Switching View to GL_FILL.\n" );
-			} else {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				fprintf( stdout, "Switching View to GL_LINE.\n" );
-			}
-		}
-		break;
-	default:
-		break;
-	} 
-}

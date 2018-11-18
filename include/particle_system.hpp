@@ -18,7 +18,7 @@
         public:
             ParticleSystem();
             ParticleSystem(GLuint Shader, GLuint TransformShader);
-            ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 origin, int numberOfParticles);
+            ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 origin, int numberOfParticles, GLuint renderType);
             
             virtual ~ParticleSystem();
             

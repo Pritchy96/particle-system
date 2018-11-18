@@ -1,38 +1,26 @@
 #include <iostream>
 #include <chrono>
-
 #include <boost/filesystem.hpp>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#define GLM_ENABLE_EXPERIMENTAL //gtx = gt eXperimental?
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
 #include "../include/render_environment.hpp"
 #include "../include/shader.hpp"
 #include "../include/particle_system.hpp"
 
-
 using namespace std;
 using namespace boost;
 
-vector<vec3> test_data_lines = {
-	vec3(0.000000, 4.000000, 12.000000),
-	vec3(2.870316, -101.411970, 1.000000),
-
-	vec3(0.000000, 0.000000, 0.2233231),
-	vec3(3.897837, 14.548908, 1.000000),
-
-	vec3(4.398729, 18.116240, 2.213213),
-	vec3(5.055743, 6.247947, 1.000000),
-
-	vec3(5.365756, 6.035206, 4.000000),
-	vec3(5.693254, 14.517317, 1.00000)
-};
+static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 auto oldTime = chrono::steady_clock::now(), newTime = chrono::steady_clock::now();
 double deltaT;
+int maxParticleSystems = 200;
+GLuint particleRenderType = GL_POINTS;
 
 int main(int argc, const char* argv[]) {
 
@@ -42,8 +30,9 @@ int main(int argc, const char* argv[]) {
     renderEnvironment *renderer = new renderEnvironment();
     cout << "Initialised renderer" << endl;
 
-	GLuint particleShader = Shader::LoadShaders("./bin/shaders/particle.vertshader", "./bin/shaders/basic.fragshader");
-	GLuint transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
+	glfwSetWindowUserPointer(renderer->window, renderer);
+	glfwSetKeyCallback(renderer->window, keyCallback);
+
 	
     while (true) {  //TODO: Write proper update & exit logic.
 		oldTime = newTime;
@@ -51,9 +40,23 @@ int main(int argc, const char* argv[]) {
 		deltaT = chrono::duration_cast<chrono::milliseconds>(newTime - oldTime).count();
 
 		for (int i = 0; i < 4; i++) {	//Can spawn n emitters per update.
-			if (renderer->renderables.size() < 1500) {
+			if (renderer->renderables.size() < maxParticleSystems) {
 				glm::vec3 origin = vec3( ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000);
-				renderer->addRenderable(new ParticleSystem(particleShader, transformShader, origin, 400));			
+				renderer->addRenderable(new ParticleSystem(renderer->particleShader, renderer->transformShader, origin, 1000, particleRenderType));			
+			}
+		}
+
+		//remove excess particle systems. Hacky, but fine for demo.
+		if (renderer->renderables.size() > maxParticleSystems) {
+			for (int i = 1; i < (renderer->renderables.size() - maxParticleSystems); i++) {
+				renderer->renderables[i]->isDead = true;
+			}
+		}
+
+		//Hacky way of setting all particle systems for demo.
+		if (particleRenderType != renderer->renderables[1]->renderType) {
+			for (int i = 1; i < renderer->renderables.size(); i++) {
+				renderer->renderables[i]->renderType = particleRenderType;
 			}
 		}
 
@@ -61,4 +64,46 @@ int main(int argc, const char* argv[]) {
     }
 
     return 0;
+}
+
+
+static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	renderEnvironment *rEnv = (renderEnvironment *)glfwGetWindowUserPointer(window);
+
+	switch (key) {
+		case(GLFW_KEY_ESCAPE) :
+			exit(0);
+			break;
+
+		case(GLFW_KEY_V) :
+			if (action == GLFW_PRESS) {
+				GLint mode[2];
+				glGetIntegerv(GL_POLYGON_MODE, mode);
+				if (mode[0] == GL_LINE) {
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					fprintf(stdout, "Switching View to GL_FILL.\n" );
+				} else {
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					fprintf(stdout, "Switching View to GL_LINE.\n" );
+				}
+			}
+			break;
+		case(GLFW_KEY_EQUAL) :
+			maxParticleSystems++;	
+			break;
+		case(GLFW_KEY_MINUS) :
+			maxParticleSystems--;	
+			break;
+		case(GLFW_KEY_1) :
+			particleRenderType = GL_POINTS;	
+			break;
+		case(GLFW_KEY_2) :
+			particleRenderType = GL_LINES;	
+			break;
+		case(GLFW_KEY_3) :
+			particleRenderType = GL_TRIANGLES;	
+			break;
+		default:
+			break;
+	}
 }

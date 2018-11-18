@@ -17,6 +17,7 @@ GLuint Shader::LoadShaders(char* vertFilePath, char* fragFilePath){
 	GLuint vertShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
+
 	string vertShaderCode = LoadFileFromDisk(vertFilePath);
 	string fragShaderCode = LoadFileFromDisk(fragFilePath);
 	cout << "Shaders Read from File" << endl;

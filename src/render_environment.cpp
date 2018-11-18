@@ -22,7 +22,6 @@
 using namespace std;
 using namespace glm;
 
-GLFWwindow* window;
 viewspaceManipulator* input;
 
 GLuint shaderID;
@@ -40,7 +39,7 @@ int framesElapsed = 0;
 
 Renderable* renderAxis;
 
-GLuint basicShader;
+
 
 vector<vec3> axis_lines = {
     vec3(0.0f, 0.0f, 0.0f),
@@ -60,7 +59,7 @@ vector<vec3> axis_colours = {
 	vec3(0.0f, 0.0f, 1.0f)
 };
 
-void renderEnvironment::setFPSCounter(GLFWwindow* window, double deltaT) {
+void renderEnvironment::setRenderWindowTitle(GLFWwindow* window, double deltaT) {
 	timeElapsed += deltaT;
 	framesElapsed++;
 
@@ -69,7 +68,7 @@ void renderEnvironment::setFPSCounter(GLFWwindow* window, double deltaT) {
 		double fps = (double)(framesElapsed / timeElapsed) * 1000;
 		char tmp[128];
 		//Write formatted data to tmp string.
-		snprintf(tmp, sizeof(tmp)/sizeof(char), "Particle System @ %.2f FPS", fps);
+		snprintf(tmp, sizeof(tmp)/sizeof(char), "Particle System @ %.2f FPS, %d Renderables", fps, renderables.size());
 		//Set window title to string.
 		glfwSetWindowTitle(window, tmp);
 		framesElapsed = 0;
@@ -78,6 +77,7 @@ void renderEnvironment::setFPSCounter(GLFWwindow* window, double deltaT) {
 }
 
 renderEnvironment::renderEnvironment() {
+
 	//Our ModelViewProjection : multiplication of our 3 matrices
 	if( !glfwInit() ) {
 		fprintf( stderr, "Failed to initialize GLFW\n" );
@@ -100,7 +100,6 @@ renderEnvironment::renderEnvironment() {
 		glfwTerminate();
 	}	
 
-	glfwSetKeyCallback(window, input->key_callback);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetWindowSizeCallback(window, windowSizeCallback);
 	glfwMakeContextCurrent(window);
@@ -124,23 +123,20 @@ renderEnvironment::renderEnvironment() {
 	}
 	
 	basicShader = Shader::LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");
+	particleShader = Shader::LoadShaders("./bin/shaders/particle.vertshader", "./bin/shaders/basic.fragshader");
+	transformShader = Shader::LoadTransformShader("./bin/shaders/transform.vertshader");
+
     renderAxis = new Renderable(basicShader, axis_lines, axis_colours);
 	addRenderable(renderAxis);
-
 }
 
 void renderEnvironment::addRenderable(Renderable* renderable) {
 	renderables.push_back(renderable);
 }
 
-
-void renderEnvironment::setupTransformShader(GLuint transformShader) {
-	tShader = transformShader;
-}
-
 void renderEnvironment::update(float deltaT) {
 	input->update(window);
-	setFPSCounter(window, deltaT);
+	setRenderWindowTitle(window, deltaT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	vector<Renderable*>::iterator renderable = renderables.begin();

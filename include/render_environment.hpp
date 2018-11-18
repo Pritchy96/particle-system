@@ -24,11 +24,15 @@
             void setupTransformShader(GLuint transformShader);   
             
             static void errorCallback(int error, const char* description);
+            static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
             static void windowSizeCallback(GLFWwindow* window, int width, int height);
-            static void setFPSCounter(GLFWwindow* window, double deltaT);
+            void setRenderWindowTitle(GLFWwindow* window, double deltaT);
             
             vector<Renderable*> renderables;
-            GLuint tShader;      
+            GLuint basicShader;
+            GLuint particleShader;
+            GLuint transformShader;
+            GLFWwindow* window;
     };
 
 #endif
