@@ -1,6 +1,7 @@
-#include <iostream>
-#include <chrono>
 #include <boost/filesystem.hpp>
+#include <chrono>
+#include <iostream>
+#include <fstream>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -19,8 +20,16 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 
 auto oldTime = chrono::steady_clock::now(), newTime = chrono::steady_clock::now();
 double deltaT;
-int maxParticleSystems = 200;
+double sampleTime = 10000;
+double currentSampleTime = sampleTime;
+int maxParticleSystems = 100;
+int maxParticles = 10000;
+int particleSystemCount = 1;
 GLuint particleRenderType = GL_POINTS;
+double timeElapsed = 0;
+int framesElapsed = 0;
+std::ofstream file;
+
 
 int main(int argc, const char* argv[]) {
 
@@ -33,16 +42,50 @@ int main(int argc, const char* argv[]) {
 	glfwSetWindowUserPointer(renderer->window, renderer);
 	glfwSetKeyCallback(renderer->window, keyCallback);
 
+    file.open ("test.csv");
+	file << "Particle Count, 1 VAO\n";
+	file << maxParticles;
+
+
 	
     while (true) {  //TODO: Write proper update & exit logic.
 		oldTime = newTime;
     	newTime = chrono::steady_clock::now();
 		deltaT = chrono::duration_cast<chrono::milliseconds>(newTime - oldTime).count();
 
-		for (int i = 0; i < 4; i++) {	//Can spawn n emitters per update.
-			if (renderer->renderables.size() < maxParticleSystems) {
+
+
+
+		currentSampleTime -= deltaT;
+
+		timeElapsed += deltaT;
+		framesElapsed++;
+
+		if (currentSampleTime <= 0) {
+			currentSampleTime = sampleTime;
+			double fps = (double)(framesElapsed / timeElapsed) * 1000;
+			char tmp[128];
+			file << ", " << fps;
+			framesElapsed = 0;
+			timeElapsed = 0;
+
+			if (particleSystemCount < maxParticleSystems) {
+				particleSystemCount++;
+			} else if (maxParticles < 1000000) {
+				particleSystemCount = 1;
+				maxParticles += 10000;
+				file << "\n" << maxParticles;
+			} else {
+				file.close();
+				exit(0);
+			}			
+		}
+		
+		
+		for (int i = 0; i < particleSystemCount; i++) {	//Can spawn n emitters per update.
+			if ((renderer->renderables.size() - 1) < particleSystemCount) {
 				glm::vec3 origin = vec3( ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000);
-				renderer->addRenderable(new ParticleSystem(renderer->particleShader, renderer->transformShader, origin, 1000, particleRenderType));			
+				renderer->addRenderable(new ParticleSystem(renderer->particleShader, renderer->transformShader, origin, maxParticles/maxParticleSystems, particleRenderType));			
 			}
 		}
 
@@ -53,16 +96,15 @@ int main(int argc, const char* argv[]) {
 			}
 		}
 
-		//Hacky way of setting all particle systems for demo.
-		if (particleRenderType != renderer->renderables[1]->renderType) {
-			for (int i = 1; i < renderer->renderables.size(); i++) {
-				renderer->renderables[i]->renderType = particleRenderType;
-			}
-		}
+
+
+		
 
         renderer->update(deltaT);
     }
 
+
+	file.close();
     return 0;
 }
 
@@ -72,6 +114,7 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 
 	switch (key) {
 		case(GLFW_KEY_ESCAPE) :
+			file.close();
 			exit(0);
 			break;
 

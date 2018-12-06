@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -34,12 +35,10 @@ double rotate_y = 0;
 double rotate_x = 0;
 double rotate_z = 0;
 
-double timeElapsed = 0;
-int framesElapsed = 0;
+// double timeElapsed = 0;
+// int framesElapsed = 0;
 
 Renderable* renderAxis;
-
-
 
 vector<vec3> axis_lines = {
     vec3(0.0f, 0.0f, 0.0f),
@@ -60,20 +59,20 @@ vector<vec3> axis_colours = {
 };
 
 void renderEnvironment::setRenderWindowTitle(GLFWwindow* window, double deltaT) {
-	timeElapsed += deltaT;
-	framesElapsed++;
+	// timeElapsed += deltaT;
+	// framesElapsed++;
 
-	//If it's more than a quarter of a second, update fps.
-	if (timeElapsed > 250) {
-		double fps = (double)(framesElapsed / timeElapsed) * 1000;
-		char tmp[128];
-		//Write formatted data to tmp string.
-		snprintf(tmp, sizeof(tmp)/sizeof(char), "Particle System @ %.2f FPS, %d Renderables", fps, renderables.size());
-		//Set window title to string.
-		glfwSetWindowTitle(window, tmp);
-		framesElapsed = 0;
-		timeElapsed = 0;
-	}
+	// //If it's more than a quarter of a second, update fps.
+	// if (timeElapsed > 250) {
+	// 	double fps = (double)(framesElapsed / timeElapsed) * 1000;
+	// 	char tmp[128];
+	// 	//Write formatted data to tmp string.
+	// 	snprintf(tmp, sizeof(tmp)/sizeof(char), "Particle System @ %.2f FPS, %d Renderables", fps, renderables.size());
+	// 	//Set window title to string.
+	// 	glfwSetWindowTitle(window, tmp);
+	// 	framesElapsed = 0;
+	// 	timeElapsed = 0;
+	// }
 }
 
 renderEnvironment::renderEnvironment() {
@@ -151,8 +150,6 @@ void renderEnvironment::update(float deltaT) {
 			++renderable;
 		}
 	}
-
-	//cout << endl;
 
 	glfwSwapBuffers(window);
 
