@@ -15,6 +15,8 @@
 using namespace glm;
 using namespace std;
 
+extern glm::vec3 wind;
+
 ParticleSystem::ParticleSystem(GLuint Shader, GLuint TransformShader, glm::vec3 origin, int numberOfParticles, GLuint renderType)
 : Renderable(Shader, renderType) {
 
@@ -44,8 +46,9 @@ void ParticleSystem::Draw(float deltaT, glm::mat4 projectionMatrix, glm::mat4 vi
 		GLuint shaderID = glGetUniformLocation(transformShader, "deltaT"); 
 		glUniform1f(shaderID, deltaT);
 
+		//TODO: WIND
 		shaderID = glGetUniformLocation(transformShader, "wind");
-		glUniform3fv(shaderID, 1, &vec3(0.02f, 0.01f, 0.0f)[0]);
+		glUniform3fv(shaderID, 1, &wind[0]);
 		
 
 		glEnable(GL_RASTERIZER_DISCARD);	//Turn rendering off
@@ -92,21 +95,77 @@ GLuint ParticleSystem::getVAO() {
 		vector<float> verts, cols, vels, ages;
 
 		for (int i = 0; i < particleCount; i++) {
-			cols.push_back(colours[i].x);
-			cols.push_back(colours[i].y);
-			cols.push_back(colours[i].z);
-
-			verts.push_back(vertexes[i].x);
-			verts.push_back(vertexes[i].y);
-			verts.push_back(vertexes[i].z);
-			
 			vec3 vel = glm::sphericalRand(4 + ((double) rand() / (RAND_MAX) / 5));
-			vels.push_back(vel.x);
-			vels.push_back(vel.y);
-			vels.push_back(vel.z);
+			float randomisedAge = (age/100.0f)-((float) rand() / RAND_MAX);
 
-			//Slightly randomise particle timouts
-			ages.push_back((age/100.0f)-((float) rand() / RAND_MAX));
+			if (renderType == GL_LINES) {
+				verts.push_back(vertexes[i].x + (vel.x*3));
+				verts.push_back(vertexes[i].y + (vel.y*3));
+				verts.push_back(vertexes[i].z + (vel.z*3));
+				verts.push_back(vertexes[i].x);
+				verts.push_back(vertexes[i].y);
+				verts.push_back(vertexes[i].z);
+
+				vels.push_back(vel.x);
+				vels.push_back(vel.y);
+				vels.push_back(vel.z);
+				vels.push_back(vel.x * 0.7);
+				vels.push_back(vel.y * 0.7);
+				vels.push_back(vel.z * 0.7);
+
+				for (int i = 0; i < 2; i++) {
+					cols.push_back(colours[i].x);
+					cols.push_back(colours[i].y);
+					cols.push_back(colours[i].z);
+
+					ages.push_back(randomisedAge);
+				}
+			} else if (renderType == GL_TRIANGLES) {
+				verts.push_back(vertexes[i].x + (vel.x*3)+5);
+				verts.push_back(vertexes[i].y + (vel.y*3));
+				verts.push_back(vertexes[i].z + (vel.z*3)+5);
+
+				verts.push_back(vertexes[i].x);
+				verts.push_back(vertexes[i].y);
+				verts.push_back(vertexes[i].z);
+
+				verts.push_back(vertexes[i].x - (vel.x*3)-5);
+				verts.push_back(vertexes[i].y + (vel.y*3));
+				verts.push_back(vertexes[i].z - (vel.z*3)-5);
+
+				vels.push_back(vel.x * 0.7);
+				vels.push_back(vel.y * 0.7);
+				vels.push_back(vel.z * 0.7);
+				vels.push_back(vel.x);
+				vels.push_back(vel.y);
+				vels.push_back(vel.z);
+				vels.push_back(vel.x * 0.7);
+				vels.push_back(vel.y * 0.7);
+				vels.push_back(vel.z * 0.7);
+
+				for (int i = 0; i < 3; i++) {
+					cols.push_back(colours[i].x);
+					cols.push_back(colours[i].y);
+					cols.push_back(colours[i].z);
+
+					ages.push_back(randomisedAge);
+				}
+			} else {	//Point
+				cols.push_back(colours[i].x);
+				cols.push_back(colours[i].y);
+				cols.push_back(colours[i].z);
+
+				verts.push_back(vertexes[i].x);
+				verts.push_back(vertexes[i].y);
+				verts.push_back(vertexes[i].z);
+				
+				vels.push_back(vel.x);
+				vels.push_back(vel.y);
+				vels.push_back(vel.z);
+
+				ages.push_back(randomisedAge);
+			}
+
 		}
 
 		glGenBuffers(1, &pos2_vbo);

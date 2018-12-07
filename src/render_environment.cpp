@@ -37,9 +37,9 @@ double rotate_z = 0;
 double timeElapsed = 0;
 int framesElapsed = 0;
 
+extern int particlesPerSystem;
+
 Renderable* renderAxis;
-
-
 
 vector<vec3> axis_lines = {
     vec3(0.0f, 0.0f, 0.0f),
@@ -68,7 +68,7 @@ void renderEnvironment::setRenderWindowTitle(GLFWwindow* window, double deltaT) 
 		double fps = (double)(framesElapsed / timeElapsed) * 1000;
 		char tmp[128];
 		//Write formatted data to tmp string.
-		snprintf(tmp, sizeof(tmp)/sizeof(char), "Particle System @ %.2f FPS, %d Renderables", fps, renderables.size());
+		snprintf(tmp, sizeof(tmp)/sizeof(char), "Particle System @ %.2f FPS, %d Systems, %d particles per System", fps, renderables.size()-1, particlesPerSystem);
 		//Set window title to string.
 		glfwSetWindowTitle(window, tmp);
 		framesElapsed = 0;
@@ -90,7 +90,7 @@ renderEnvironment::renderEnvironment() {
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //For MacOS compat, apparrently 
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //For MacOS compat, apparently 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 	window = glfwCreateWindow(gl_width, gl_height, "Particle System", NULL, NULL);

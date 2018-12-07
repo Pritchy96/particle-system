@@ -19,8 +19,13 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 
 auto oldTime = chrono::steady_clock::now(), newTime = chrono::steady_clock::now();
 double deltaT;
+
 int maxParticleSystems = 200;
+int particlesPerSystem = 1000;
 GLuint particleRenderType = GL_POINTS;
+
+glm::vec3 wind = glm::vec3(0.02f, 0.01f, 0.0f);
+float windCoeff = 0.01f;
 
 int main(int argc, const char* argv[]) {
 
@@ -32,31 +37,23 @@ int main(int argc, const char* argv[]) {
 
 	glfwSetWindowUserPointer(renderer->window, renderer);
 	glfwSetKeyCallback(renderer->window, keyCallback);
-
 	
     while (true) {  //TODO: Write proper update & exit logic.
 		oldTime = newTime;
     	newTime = chrono::steady_clock::now();
 		deltaT = chrono::duration_cast<chrono::milliseconds>(newTime - oldTime).count();
 
-		for (int i = 0; i < 4; i++) {	//Can spawn n emitters per update.
+		// for (int i = 0; i < 4; i++) {	//Can spawn n emitters per update.
 			if (renderer->renderables.size() < maxParticleSystems) {
 				glm::vec3 origin = vec3( ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000, ((float) rand() / RAND_MAX) * 1000);
-				renderer->addRenderable(new ParticleSystem(renderer->particleShader, renderer->transformShader, origin, 1000, particleRenderType));			
+				renderer->addRenderable(new ParticleSystem(renderer->particleShader, renderer->transformShader, origin, particlesPerSystem, particleRenderType));			
 			}
-		}
+		// }
 
 		//remove excess particle systems. Hacky, but fine for demo.
 		if (renderer->renderables.size() > maxParticleSystems) {
 			for (int i = 1; i < (renderer->renderables.size() - maxParticleSystems); i++) {
 				renderer->renderables[i]->isDead = true;
-			}
-		}
-
-		//Hacky way of setting all particle systems for demo.
-		if (particleRenderType != renderer->renderables[1]->renderType) {
-			for (int i = 1; i < renderer->renderables.size(); i++) {
-				renderer->renderables[i]->renderType = particleRenderType;
 			}
 		}
 
@@ -89,10 +86,18 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 			}
 			break;
 		case(GLFW_KEY_EQUAL) :
-			maxParticleSystems++;	
+			if (mods == GLFW_MOD_SHIFT) {
+				maxParticleSystems++;
+			} else {
+				particlesPerSystem += 100;
+			}
 			break;
 		case(GLFW_KEY_MINUS) :
-			maxParticleSystems--;	
+			if (mods == GLFW_MOD_SHIFT) {
+				if (maxParticleSystems > 0) maxParticleSystems--;
+			} else {
+				if (particlesPerSystem > 0) particlesPerSystem -= 100;
+			}
 			break;
 		case(GLFW_KEY_1) :
 			particleRenderType = GL_POINTS;	
@@ -103,6 +108,24 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		case(GLFW_KEY_3) :
 			particleRenderType = GL_TRIANGLES;	
 			break;
+		case(GLFW_KEY_X) :
+			if (mods == GLFW_MOD_SHIFT) {
+				wind.x -= windCoeff;
+			} else {
+				wind.x += windCoeff;
+			}
+		case(GLFW_KEY_Y) :
+			if (mods == GLFW_MOD_SHIFT) {
+				wind.y -= windCoeff;
+			} else {
+				wind.y += windCoeff;
+			}
+		case(GLFW_KEY_Z) :
+			if (mods == GLFW_MOD_SHIFT) {
+				wind.z -= windCoeff;
+			} else {
+				wind.z += windCoeff;
+			}
 		default:
 			break;
 	}
