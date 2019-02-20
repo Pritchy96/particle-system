@@ -15,7 +15,7 @@
 
     class renderEnvironment {
         public:
-            renderEnvironment();
+            renderEnvironment(glm::vec3 backgroundColour);
             ~renderEnvironment();
 
             void addRenderable(Renderable* renderable);

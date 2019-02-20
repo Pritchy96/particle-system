@@ -37,7 +37,7 @@ int main(int argc, const char* argv[]) {
 	srand (time(NULL));
     cout << "Launching Program" << endl;
 
-    renderEnvironment *renderer = new renderEnvironment();
+    renderEnvironment *renderer = new renderEnvironment(glm::vec3(0.7f, 0.7f, 0.7f));
     cout << "Initialised renderer" << endl;
 
 	GLuint shader = Shader::LoadShaders("./bin/shaders/basic.vertshader", "./bin/shaders/basic.fragshader");

@@ -76,15 +76,12 @@ void renderEnvironment::setFPSCounter(GLFWwindow* window, double deltaT) {
 	}
 }
 
-renderEnvironment::renderEnvironment() {
-	//Our ModelViewProjection : multiplication of our 3 matrices
+renderEnvironment::renderEnvironment(glm::vec3 backgroundColour) {
 	if( !glfwInit() ) {
 		fprintf( stderr, "Failed to initialize GLFW\n" );
 	}
 
 	glfwSetErrorCallback(errorCallback);
-
-	input = new viewspaceManipulator(window, initialCameraPos);
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -93,6 +90,7 @@ renderEnvironment::renderEnvironment() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 	window = glfwCreateWindow(gl_width, gl_height, "Render Window", NULL, NULL);
+	input = new viewspaceManipulator(window, initialCameraPos);
 
 	if( !window ) {
 		fprintf(stderr, "Failed to open GLFW window.\n" );
@@ -100,11 +98,14 @@ renderEnvironment::renderEnvironment() {
 	}	
 
 	glfwSetKeyCallback(window, input->key_callback);
+	glfwSetMouseButtonCallback(window, input->mouseButtonCallback);
+	glfwSetScrollCallback(window, input->scrollCallback);
+	glfwSetCursorPosCallback(window, input->cursorCallback);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetWindowSizeCallback(window, windowSizeCallback);
 	glfwMakeContextCurrent(window);
 
-	glClearColor(0.00f, 0.00f, 0.00f, 0.01f);
+	glClearColor(backgroundColour.r, backgroundColour.g, backgroundColour.b, 0.01f);
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -154,9 +155,6 @@ void renderEnvironment::update(float deltaT) {
 			++renderable;
 		}
 	}
-
-	//cout << endl;
-
 	glfwSwapBuffers(window);
 
 	//Update other events like input handling 
